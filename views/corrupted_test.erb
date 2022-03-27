@@ -1,0 +1,10 @@
+<h1>Corruption Test</h1>
+<p><%= @user_sample.size%> Users to Test</p>
+
+<% @corrupted.each do |result| %>
+    <div> 
+        <p>id: <%= result[0]%></p>
+        <p>user corrupted?: <%= result[1] %></p>
+        <p>user tweets corrupted?: <%= result[2]%></p>
+    </div>
+<%end%>

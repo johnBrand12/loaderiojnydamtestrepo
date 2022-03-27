@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+
+                <style>
+                    table.center {
+                        margin-left: auto; 
+                        margin-right: auto;
+                    }
+                    table{
+                        border-spacing: 25px
+                    }
+                    </style>
+                    <% if flash[:notice] %>
+                    <p style="color:red;"><%= flash[:notice] %></p>
+                    <% end %>
+                    <h1 style= "text-align: center"> Create an Account </h1>
+                    <form method = "post" action = "/signup">
+                    <form>
+                        <table class = "center">
+                            <tr>
+                                <td><label for= "Username"> Username: </label></td>
+                                <td><input type="text" name="username"></td>
+                            </tr>
+                            <tr>
+                                <td><label for= "DisplayName"> Name: </label></td>
+                                <td><input type="text" name="display_name"></td>
+                            </tr>
+                            <tr>
+                                <td><label for= "Email"> Email: </label></td>
+                                <td><input type="text" name="email"></td>
+                            </tr>
+                            <tr>
+                                <td><label for= "Password"> Password: </label></td>
+                                <td><input type="password" name="password"></td>
+                            </tr>
+                            <tr>
+                                <td><label for= "Password"> Password Confirmation: </label></td>
+                                <td><input type="password" name="pw_confirm"></td>
+                            </tr>
+                            <tr>
+                                <td style = "text-align: center"><input type="submit"></td>
+                            </tr>
+                        </table>
+                </form>
+
+    </body>
+</html>

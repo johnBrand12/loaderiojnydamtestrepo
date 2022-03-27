@@ -1,0 +1,16 @@
+<div>
+    <% flash.keys.each do |type|%>
+        <div class="alert alert-<%=type%>">
+            <%= flash[type]%>
+        </div>
+    <% end%>
+    <form method="POST" action="/sign_in">
+        <label>username</label>
+        <input type="text" name="username">
+        <br>
+        <label>password</label>
+        <input type="password" name="password">
+        <br>
+        <button type="submit" name="sign-in">sign in</button>
+    </form>
+</div>

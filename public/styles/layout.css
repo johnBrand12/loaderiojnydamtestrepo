@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    outline: none;
+}
+
+html {
+    box-sizing: border-box;
+    font-size: 90.5%;
+}
+
+body {
+    font-family: TwitterChirpExtendedHeavy, Verdana, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.main-container {
+    /* font-family: 'Rubik', sans-serif; */
+    display: flex;
+    flex-direction: row;
+    min-height: 100vh;
+    
+}
+
+.navigation {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    border-right: 2px solid gainsboro;
+    margin-top: 10px;
+    padding-left: 50px;
+    padding-top:10px;
+    flex: 2;
+}
+
+.side-nav {
+    display: flex;
+    flex-direction: column; 
+}
+
+.side-nav-item a {
+    text-decoration: none;
+    font-size: 25px;
+    color: black;
+}
+
+.side-nav-item {
+    width: max-content;
+    margin-bottom: 5px;
+    padding: 20px;
+    border-radius: 30px;
+
+    text-decoration: none;
+    font-size: 25px;
+    color: black;
+}
+
+.active-nav-item {
+    background-color: rgb(236, 236, 236);
+}
+
+.side-nav-item:hover {
+    background-color: rgba(236, 236, 236, 0.431);
+}
+
+.controls {
+    flex:20%;
+}
+
+.nav-link {
+    text-decoration: none;
+    width: 100%;
+    height: 100%;
+}
+
+.nav-link-text {
+    color: black;
+    text-align: center;
+}
+
+textarea {
+    width: 100%;
+}
+
+#new-tweet {
+    width: 400px;
+}

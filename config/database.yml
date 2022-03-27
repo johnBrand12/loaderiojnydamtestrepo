@@ -1,0 +1,19 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: nanotwitter_dev
+  pool: 5
+
+test:
+  adapter: postgresql
+  encoding: unicode
+  database: nanotwitter_test
+  pool: 2
+
+production:
+  adapter: postgresql
+  encoding: unicode
+  database: nanotwitter_prod
+  pool: 2
+  username: your_username
+  password: your_password

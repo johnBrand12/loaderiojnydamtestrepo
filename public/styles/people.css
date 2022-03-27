@@ -1,0 +1,126 @@
+.ppl-main-container {
+
+    display: flex;
+    height: 100%;
+    width: 100%;
+    flex-direction: row;
+}
+
+.ppl-right-col {
+
+    display: flex;
+    flex: 3;
+    height: 100%;
+}
+
+.ppl-left-col {
+
+    display: flex;
+    flex-direction: column;
+    flex: 7;
+    height: 100%;
+}
+
+.ppl-search-input-container {
+    display: flex;
+    height: 5rem;
+    width: 70%;
+    flex-direction: row;
+    align-items: center;
+
+}
+
+.ppl-search-upper-container {
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 10rem;
+}
+
+.ppl-search-friends-input {
+
+    outline: none;
+    padding-left: 1rem;
+    font-size: 1.2rem;
+    border-radius: 1.5rem;
+    border-style: solid;
+    border-width: 0.2rem;
+    border-color: darkgray;
+    width: 100%;
+    height: 100%;
+    color: darkgray;
+    font-size: 2rem;
+}
+
+.ppl-search-friends-button {
+    outline: none;
+    border-style: none;
+    margin-left: 1rem;
+    height: 3rem;
+    background-color: #1e9bf0;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    color: white;
+    width: 8rem;
+}
+
+.ppl-search-component-container {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.ppl-search-result-component {
+    display: flex;
+    flex-direction: row;
+    border-radius: 0.5rem;
+    background-color: #96d2fa;
+    width: '90%';
+    height: 4rem;
+    margin-bottom: 0.5rem;
+    box-shadow: 0px 0px 3px black;
+}
+
+.ppl-twitterlogo {
+    height: 2rem;
+    width: 2rem;
+}
+
+.ppl-image-container {
+    display: flex;
+    width: 3rem;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.ppl-friend-name-container {
+    width: 10rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ppl-button-container {
+    display: flex;
+    flex-direction: row;
+    width: 20rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.ppl-follow-button-type {
+    height: 1.7rem;
+    border-radius: 0.2rem;
+    outline: none;
+    margin-right: 0.3rem;
+    width: 6rem;
+    border-style: none;
+}
+
+

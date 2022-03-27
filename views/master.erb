@@ -1,0 +1,19 @@
+<html>
+    <head></head>
+    <body>
+        <h1>Model Overview</h1>
+        <h2>Tweets</h2>
+        <ul>
+            <% @tweets.each do |tweet|%>
+                <li>
+                    <div>
+                        <p><%= tweet.text%></p>
+                        <p><%= tweet.user.username%></p>
+                        <p>likes: <%= tweet.likes.length%></p> 
+                        <p>retweets:  <%= tweet.retweets.length%></p>
+                    </div>
+                </li>
+            <%end%>
+        </ul>
+    </body>
+</html>

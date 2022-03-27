@@ -1,0 +1,12 @@
+.profile {
+    display:flex;
+    flex-direction: column;
+    padding-left:10px;
+}
+
+.tweet {
+    background-color: rgb(245, 245, 245);
+    padding: 10px;
+    margin: 10px;
+    border-radius: 20px;
+}

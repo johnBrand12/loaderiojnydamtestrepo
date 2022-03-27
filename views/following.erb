@@ -1,0 +1,29 @@
+<head>
+    <title>Nanotwitter | Following</title>
+    <link rel="stylesheet" type="text/css" href="/styles/user.css">
+</head>
+
+<div class="content">
+        <% flash.keys.each do |type|%>
+            <div class="alert alert-<%=type%>">
+                <%= flash[type]%>
+            </div>
+        <% end%>
+    <h1>  <%= session[:user].username%>  Following </h1>
+    <br>
+    <br>
+       <% @user.fan_followings.each do |fan_following| %>
+        <div class="followings">
+                    <p><a href="/user/<%="#{fan_following.star.username}"%>"><span class="fw-bold"><%=fan_following.star.username%></span></a></p>
+                    <p><span><%=fan_following.star.display_name%></span></a></p>
+                    <p>
+                    <% if fan_following.fan_active == false%>
+                        <a href= "/updatefollowing/<%="#{fan_following.id}"%>"> Follow </a>
+                    <%else%>
+                       <a href= "/updatefollowing/<%="#{fan_following.id}"%>"> Following </a>
+                    <%end%> 
+                    </p>
+        </div>
+    <%end%>
+</div>
+

@@ -1,0 +1,48 @@
+<head>
+    <title>Nanotwitter | Home</title>
+    <link rel="stylesheet" type="text/css" href="/styles/home_page.css">
+</head>
+
+<div class="content">
+        <% flash.keys.each do |type|%>
+            <div class="alert alert-<%=type%>">
+                <%= flash[type]%>
+            </div>
+        <% end%>
+    <% @feed.each do |tweet| %>
+       <div class="tweet-wrapper">
+            <div class="tweet" id=<%= tweet.id%>>
+                <p><span class="fw-bold"><%=tweet.user.display_name%></span> <a href="/user/<%=tweet.user.username%>">@<%= tweet.user.username%></a></p>
+                <p><%= tweet.text%></p>
+        
+                <% if @cur_user.likes.to_a.intersection(tweet.likes.to_a).size > 0%>
+                    <button class="like liked" id="like-button-<%= tweet.id%>"><i class="bi bi-heart"></i> <%= tweet.likes.length%></button>
+                <%else%>
+                    <button class="like" id="like-button-<%= tweet.id%>"><i class="bi bi-heart"></i> <%= tweet.likes.length%></button>
+                <%end%>
+                <% if @cur_user.retweets.to_a.intersection(tweet.retweets.to_a).size > 0%>
+                    <button class="retweet retweeted" id="retweet-button-<%= tweet.id%>"><i class="bi bi-arrow-repeat"></i><%= tweet.retweets.length%></button>
+                <%else%>
+                    <button class="retweet" id="retweet-button-<%= tweet.id%>"><i class="bi bi-arrow-repeat"></i><%= tweet.retweets.length%></button>
+                <%end%>
+                
+                <button class="reply" id="reply-button-<%= tweet.id%>"><i class="bi bi-chat"></i> <%= tweet.tweets.length%></button>        
+            </div>
+            <div class="reply-thread" id="reply-thread-<%=tweet.id%>">
+                <% tweet.tweets.each do |reply|%>
+                    <div class="tweet"  id=<%=reply.id%>>
+                        <p><span class="fw-bold"><%=reply.user.display_name%></span> <a href="/user/<%=reply.user.username%>">@<%= reply.user.username%></a></p>
+                        <p><%= reply.text%></p>
+                    </div>
+                <%end%>
+                
+                <form action="/reply/<%=tweet.id%>" method="POST">
+                    <input name="reply" placeholder="enter reply" />
+                    <button type="submit" class="btn btn-primary">Reply</button>
+                </form>
+            </div>
+       </div>
+        
+    <%end%>
+</div>
+

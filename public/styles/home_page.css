@@ -1,0 +1,83 @@
+html {
+    font-size:100%;
+}
+
+.content {
+    /* width: max-content; */
+    
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    flex: 1
+}
+
+.tweet {
+    background-color: rgb(245, 245, 245);
+    padding: 10px;
+    margin: 10px;
+    border-radius: 20px;
+    width: 500px;
+}
+
+.like {
+    border: none;
+    border-radius: 5px;
+    background-color: none;
+    padding: 6px;
+}
+
+
+
+.like:hover {
+    background-color:rgb(255, 88, 88);
+    color: white;
+}
+
+.liked {
+    border: none;
+    border-radius: 5px;
+    background-color: none;
+    padding: 6px;
+    background-color:rgb(255, 88, 88);
+    color: white;
+}
+
+.retweet{
+    border: none;
+    border-radius: 5px;
+    background-color: none;
+    padding: 6px;
+}
+
+.retweet:hover {
+    background-color:rgb(19, 199, 43);
+    color: white;
+}
+
+.retweeted {
+    background-color:rgb(19, 199, 43);
+    color: white;
+}
+
+#reply-button {
+    border: none;
+    border-radius: 5px;
+    background-color: none;
+    padding: 6px;
+}
+
+.reply {
+    border: none;
+    border-radius: 5px;
+    background-color: none;
+    padding: 6px;
+}
+.reply:hover {
+    background-color:rgb(86, 89, 251);
+    color: white;
+}
+
+.reply-thread {
+
+    margin-left: 30px;
+}
