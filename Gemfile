@@ -28,6 +28,9 @@ group :production do
     gem 'test_helper', '~> 0.0.1'
     gem 'bcrypt'
     gem 'sinatra-flash'
+    gem 'thin'
+    gem 'puma'
+    
 end
 
 group :development do
@@ -43,5 +46,7 @@ group :development do
     gem 'test_helper', '~> 0.0.1'
     gem 'bcrypt'
     gem 'sinatra-flash'
+    gem 'thin'
+    gem 'puma'
 end
 gem "colorize", "~> 0.8.1"
