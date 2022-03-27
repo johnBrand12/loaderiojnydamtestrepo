@@ -2,7 +2,7 @@ development:
   adapter: postgresql
   encoding: unicode
   database: nanotwitter_dev
-  pool: 5
+  pool: 8
 
 test:
   adapter: postgresql
@@ -14,6 +14,6 @@ production:
   adapter: postgresql
   encoding: unicode
   database: nanotwitter_prod
-  pool: 2
+  pool: 8
   username: your_username
   password: your_password
