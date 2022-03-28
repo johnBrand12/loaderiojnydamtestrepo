@@ -15,5 +15,5 @@ production:
   encoding: unicode
   database: nanotwitter_prod
   pool: 8
-  username: your_username
-  password: your_password
+  username: nwcyukwxqkvtpa
+  password: e203afbc26a2b7e8f7feb0071f0a8487c57112d7c6526476cbc5c221fbf40411
