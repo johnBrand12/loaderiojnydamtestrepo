@@ -3,11 +3,13 @@ development:
   encoding: unicode
   database: nanotwitter_dev
   pool: 8
+  idle_timeout: 10
 
 test:
   adapter: postgresql
   encoding: unicode
   database: nanotwitter_test
+  idle_timeout: 10
   pool: 2
 
 production:
@@ -15,5 +17,6 @@ production:
   encoding: unicode
   database: nanotwitter_prod
   pool: 8
+  idle_timeout: 10
   username: nwcyukwxqkvtpa
   password: e203afbc26a2b7e8f7feb0071f0a8487c57112d7c6526476cbc5c221fbf40411

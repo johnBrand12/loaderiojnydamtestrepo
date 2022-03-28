@@ -66,6 +66,10 @@ class SimpleApp < Sinatra::Base
 
     get '/home' do 
      #protected
+
+        connection = ActiveRecord::Base.connection_pool.checkout
+
+        
         if (params[:user_id] != nil) 
 
             session[:user] = User.find(params[:user_id].to_i)
@@ -91,6 +95,9 @@ class SimpleApp < Sinatra::Base
                 @feed.push(tweet)
             end
         end
+
+        ActiveRecord::Base.connection_pool.checkin(connection)
+
         erb(:home)
     end
 
