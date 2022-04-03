@@ -109,6 +109,10 @@ class SimpleApp < Sinatra::Base
         erb(:notifications)
     end
 
+    after do
+        ActiveRecord::Base.clear_active_connections!
+    end
+
     
 
     run! if app_file == $0
