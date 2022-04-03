@@ -8,9 +8,9 @@ module Sinatra
             module Test
                 def self.registered(app)
 
-                    app.get '/loaderio-4724b0e51900640a9868be723f4a1589.txt' do
+                    app.get '/loaderio-89d195117aac48758a81638e7f0c784f.txt' do
                         puts "This is a test to see if loader works"
-                        send_file 'loaderio-4724b0e51900640a9868be723f4a1589.txt'
+                        send_file 'loaderio-89d195117aac48758a81638e7f0c784f.txt'
                     end
 
                     app.get '/test/status' do
