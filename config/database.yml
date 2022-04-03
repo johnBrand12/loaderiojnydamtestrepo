@@ -16,6 +16,6 @@ production:
   adapter: postgresql
   encoding: unicode
   database: nanotwitter_prod
-  pool: 8
+  pool: 16
   idle_timeout: 10
   url: <%= ENV["DATABASE_URL'"] %>
