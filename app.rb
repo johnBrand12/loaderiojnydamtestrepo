@@ -6,6 +6,8 @@ require "sinatra/activerecord"
 require "active_record"
 require 'sinatra/flash'
 require 'faker'
+require 'redis'
+require 'json'
 
 require_relative './lib/authentication'
 require_relative './lib/tweet_actions'
@@ -48,6 +50,8 @@ class SimpleApp < Sinatra::Base
 
     set :public_folder, 'public'
 
+   
+
     @logger = Logger.new($stdout)
 
     get '/' do
@@ -69,32 +73,79 @@ class SimpleApp < Sinatra::Base
 
         puts 'this is the connection'
 
+        @redis = Redis.new(url: 'redis://redistogo:1af524c39770f9e227ef0f94a3e6ac94@sole.redistogo.com:10663/')
+
         
         if (params[:user_id] != nil) 
 
-            session[:user] = User.find(params[:user_id].to_i)
+            puts "The user id is #{params[:user_id]}"
 
+            # if (!redis.get(""))
+            #     session[:user] = User.find(params[:user_id].to_i)
+            # end
+
+            if (!@redis.get("user#{params[:user_id]}userobj"))
+                session[:user] = User.find(params[:user_id].to_i)
+
+                cached_user_object = session[:user].to_json
+
+                @redis.set("user#{params[:user_id]}userobj", cached_user_object)
+                puts "this is the session user"
+                session[:user] = JSON.parse(cached_user_object)
+
+            else
+                
+                cached_user_object = @redis.get("user#{params[:user_id]}userobj")
+                session[:user] = JSON.parse(cached_user_object)
+
+            end
         else
             authenticate! 
         end 
 
-        @cur_user = User.find_by(username:session[:user].username)
-        @feed = []
-        followings = []
-        @cur_user.fan_followings.each do |following|
-            puts "This is the following"
-            puts following.to_json
-            followings.push(following.star.id)
-        end
-        @tweets = Tweet.all # create user feed
-        @tweets.each do |tweet|
-            if followings.include? tweet.user_id
-                if @feed.size == 50
-                    break
-                end
-                @feed.push(tweet)
+        retrieved_followings = nil
+
+        if (!@redis.get("user#{params[:user_id]}followinglist"))
+
+            @cur_user = User.find(params[:user_id].to_i);
+            @feed = []
+            followings = []
+            @cur_user.fan_followings.each do |following|
+                puts "This is the following"
+                puts following.to_json
+                followings.push(following.star.id)
             end
+
+            @redis.set("user#{params[:user_id]}followinglist", followings.to_json)
+
+        else
+            cached_following_list = @redis.get("user#{params[:user_id]}followinglist")
+            retrieved_followings = JSON.parse(cached_following_list)
         end
+
+        ## assuming backend invalidation hasn't taken place yet
+
+
+
+        if (!@redis.get("user#{params[:user_id]}feedtweets"))
+
+            @tweets = Tweet.all # create user feed
+            @tweets.each do |tweet|
+                if followings.include? tweet.user_id
+                    if @feed.size == 50
+                        break
+                    end
+                    @feed.push(tweet)
+                end
+            end
+
+            @redis.set("user#{params[:user_id]}feedtweets", @feed.to_json)
+
+        else
+            cached_tweets = @redis.get("user#{params[:user_id]}feedtweets")
+            @feed = JSON.parse(cached_tweets)
+        end
+
         erb(:home)
     end
 
