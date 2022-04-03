@@ -69,6 +69,8 @@ class SimpleApp < Sinatra::Base
 
         connection = ActiveRecord::Base.connection_pool.checkout
 
+        puts 'this is the connection'
+
         
         if (params[:user_id] != nil) 
 

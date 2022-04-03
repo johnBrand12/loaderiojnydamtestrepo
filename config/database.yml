@@ -18,4 +18,4 @@ production:
   database: nanotwitter_prod
   pool: 8
   idle_timeout: 10
-  url: <%= ENV["HEROKU_POSTGRESQL_PURPLE_URL"] %>
+  url: <%= ENV["DATABASE_URL'"] %>
