@@ -67,8 +67,6 @@ class SimpleApp < Sinatra::Base
     get '/home' do 
      #protected
 
-        connection = ActiveRecord::Base.connection_pool.checkout
-
         puts 'this is the connection'
 
         
@@ -97,9 +95,6 @@ class SimpleApp < Sinatra::Base
                 @feed.push(tweet)
             end
         end
-
-        ActiveRecord::Base.connection_pool.checkin(connection)
-
         erb(:home)
     end
 
