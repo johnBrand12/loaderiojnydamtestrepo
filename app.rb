@@ -113,6 +113,8 @@ class SimpleApp < Sinatra::Base
 
         followings = []
 
+        @cur_user = nil
+
         if (!settings.redis_instance.get("user#{params[:user_id]}followinglist"))
 
             @cur_user = User.find(params[:user_id].to_i);
@@ -133,6 +135,7 @@ class SimpleApp < Sinatra::Base
         ## assuming backend invalidation hasn't taken place yet
 
 
+        @tweets = []
 
         if (!settings.redis_instance.get("user#{params[:user_id]}feedtweets"))
 
