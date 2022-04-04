@@ -119,10 +119,13 @@ class SimpleApp < Sinatra::Base
 
             @cur_user = User.find(params[:user_id].to_i);
             @feed = []
-            @cur_user.fan_followings.each do |following|
-                puts "This is the following"
-                puts following.to_json
-                followings.push(following.star.id)
+
+            if (@cur_user.fan_followings != nil)
+                @cur_user.fan_followings.each do |following|
+                    puts "This is the following"
+                    puts following.to_json
+                    followings.push(following.star.id)
+                end
             end
 
             settings.redis_instance.set("user#{params[:user_id]}followinglist", followings.to_json)
