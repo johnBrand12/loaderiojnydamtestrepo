@@ -157,7 +157,9 @@ class SimpleApp < Sinatra::Base
 
         else
             cached_tweets = settings.redis_instance.get("user#{params[:user_id]}feedtweets")
-            @feed = JSON.parse(cached_tweets)
+            if (cached_tweets != 'null')
+                @feed = JSON.parse(cached_tweets)
+            end
         end
 
         settings.logger_instance.info "#{params[:user_id]} has the following feed object: #{@feed.to_s}"
