@@ -31,7 +31,6 @@ require 'logger'
 
 
 class SimpleApp < Sinatra::Base 
-    logger = Logger.new(STDOUT)
 
     set :root, File.dirname(__FILE__)
 
@@ -54,11 +53,11 @@ class SimpleApp < Sinatra::Base
    
     configure do
         @redis = Redis.new(url: 'redis://redistogo:1af524c39770f9e227ef0f94a3e6ac94@sole.redistogo.com:10663/')
+        @logger = Logger.new(STDOUT)
         set :redis_instance, @redis
+        set :logger_instance, @logger
     end
 
-
-    @logger = Logger.new($stdout)
 
     get '/' do
         if session[:user]
@@ -134,6 +133,7 @@ class SimpleApp < Sinatra::Base
         else
             cached_following_list = settings.redis_instance.get("user#{params[:user_id]}followinglist")
             retrieved_followings = JSON.parse(cached_following_list)
+            followings = retrieved_followings
         end
 
         ## assuming backend invalidation hasn't taken place yet
@@ -159,6 +159,8 @@ class SimpleApp < Sinatra::Base
             cached_tweets = settings.redis_instance.get("user#{params[:user_id]}feedtweets")
             @feed = JSON.parse(cached_tweets)
         end
+
+        settings.logger_instance.info "#{params[:user_id]} has the following feed object: #{@feed.to_s}"
 
         erb(:home)
     end
