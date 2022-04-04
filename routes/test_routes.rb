@@ -13,6 +13,11 @@ module Sinatra
                         send_file 'loaderio-89d195117aac48758a81638e7f0c784f.txt'
                     end
 
+
+                    app.get '/test/loader' do
+                        send_file 'loaderio-payload.json'
+                    end
+
                     app.get '/test/status' do
                         @user_count =  User.all.length 
                         @tweet_count = Tweet.all.length 
