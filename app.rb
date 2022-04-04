@@ -114,6 +114,7 @@ class SimpleApp < Sinatra::Base
         followings = []
 
         @cur_user = nil
+        @feed = []
 
         if (!settings.redis_instance.get("user#{params[:user_id]}followinglist"))
 
