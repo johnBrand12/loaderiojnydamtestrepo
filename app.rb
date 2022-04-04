@@ -50,7 +50,13 @@ class SimpleApp < Sinatra::Base
 
     set :public_folder, 'public'
 
+    
    
+    configure do
+        @redis = Redis.new(url: 'redis://redistogo:1af524c39770f9e227ef0f94a3e6ac94@sole.redistogo.com:10663/')
+        set :redis_instance, @redis
+    end
+
 
     @logger = Logger.new($stdout)
 
@@ -73,7 +79,7 @@ class SimpleApp < Sinatra::Base
 
         puts 'this is the connection'
 
-        @redis = Redis.new(url: 'redis://redistogo:1af524c39770f9e227ef0f94a3e6ac94@sole.redistogo.com:10663/')
+        redis_instance = settings.redis_instance
 
         
         if (params[:user_id] != nil) 
@@ -84,18 +90,18 @@ class SimpleApp < Sinatra::Base
             #     session[:user] = User.find(params[:user_id].to_i)
             # end
 
-            if (!@redis.get("user#{params[:user_id]}userobj"))
+            if (!settings.redis_instance.get("user#{params[:user_id]}userobj"))
                 session[:user] = User.find(params[:user_id].to_i)
 
                 cached_user_object = session[:user].to_json
 
-                @redis.set("user#{params[:user_id]}userobj", cached_user_object)
+                settings.redis_instance.set("user#{params[:user_id]}userobj", cached_user_object)
                 puts "this is the session user"
                 session[:user] = JSON.parse(cached_user_object)
 
             else
                 
-                cached_user_object = @redis.get("user#{params[:user_id]}userobj")
+                cached_user_object = settings.redis_instance.get("user#{params[:user_id]}userobj")
                 session[:user] = JSON.parse(cached_user_object)
 
             end
@@ -105,7 +111,7 @@ class SimpleApp < Sinatra::Base
 
         retrieved_followings = nil
 
-        if (!@redis.get("user#{params[:user_id]}followinglist"))
+        if (!settings.redis_instance.get("user#{params[:user_id]}followinglist"))
 
             @cur_user = User.find(params[:user_id].to_i);
             @feed = []
@@ -116,10 +122,10 @@ class SimpleApp < Sinatra::Base
                 followings.push(following.star.id)
             end
 
-            @redis.set("user#{params[:user_id]}followinglist", followings.to_json)
+            settings.redis_instance.set("user#{params[:user_id]}followinglist", followings.to_json)
 
         else
-            cached_following_list = @redis.get("user#{params[:user_id]}followinglist")
+            cached_following_list = settings.redis_instance.get("user#{params[:user_id]}followinglist")
             retrieved_followings = JSON.parse(cached_following_list)
         end
 
@@ -127,7 +133,7 @@ class SimpleApp < Sinatra::Base
 
 
 
-        if (!@redis.get("user#{params[:user_id]}feedtweets"))
+        if (!settings.redis_instance.get("user#{params[:user_id]}feedtweets"))
 
             @tweets = Tweet.all # create user feed
             @tweets.each do |tweet|
@@ -139,10 +145,10 @@ class SimpleApp < Sinatra::Base
                 end
             end
 
-            @redis.set("user#{params[:user_id]}feedtweets", @feed.to_json)
+            settings.redis_instance.set("user#{params[:user_id]}feedtweets", @feed.to_json)
 
         else
-            cached_tweets = @redis.get("user#{params[:user_id]}feedtweets")
+            cached_tweets = settings.redis_instance.get("user#{params[:user_id]}feedtweets")
             @feed = JSON.parse(cached_tweets)
         end
 
