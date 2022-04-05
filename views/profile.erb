@@ -17,7 +17,7 @@
         <%end%>
     </div>
     <div class="user-tweets">
-        <% if @usertweets.count %>
+        <% if @usertweets.count == 0 %>
             <p>User has no tweets!</p>
         <%else%>
             <% @usertweets.each do |tweet|%>
