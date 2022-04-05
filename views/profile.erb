@@ -7,8 +7,8 @@
         <h2><%= @user["display_name"]%></h2>
         <p><%= @user["username"]%></p>
         <div class="user-followings">
-            <a href="/followers"><%= @userstarfollowingcount%> Followers</a>
-            <a href="/following"><%= @userfanfollowingcount%> Followings </a>
+            <a href="/followers?uid=<%= @user["id"] %>"><%= @userstarfollowingcount%> Followers</a>
+            <a href="/following?uid=<%= @user["id"] %>"><%= @userfanfollowingcount%> Followings </a>
         </div>
         <% if @user == session[:user]%>
             <button class="btn btn-warning">edit profile</button>

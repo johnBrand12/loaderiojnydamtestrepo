@@ -9,22 +9,10 @@
                 <%= flash[type]%>
             </div>
         <% end%>
-    <h1> <%= session[:user].username%>  Followers</h1>
+    <h1> <%= session[:user]["username"]%> Followers</h1>
     <br>
-       <% @user.star_followings.each do |star_following| %>
-        <div class="followings">
-            <p><a href="/user/<%="#{star_following.fan.username}"%>"><span class="fw-bold"><%=star_following.fan.username%></span></a></p>
-            <p><span><%=star_following.fan.display_name%></span></a>
-            <%if(@user.fan_followings.exists?(star_id: star_following.fan_id))%>
-            <br>
-                    <%if (@user.fan_followings.where(star_id: star_following.fan_id).pick(:fan_active))%>
-                        <a href= "/updatefollowers/<%="#{@user.fan_followings.where(star_id: star_following.fan_id).pick(:id)}"%>"> Following </a>
-                    <%else%>
-                       <a href= "/updatefollowers/<%="#{@user.fan_followings.where(star_id: star_following.fan_id).pick(:id)}"%>"> Follow </a>
-                    <%end%>
-            <%else%>
-                <a href= "/insertfollowing?starid=<%="#{star_following.fan_id}"%>&fanid=<%="#{star_following.star_id}"%>"> Follow </a>
-            <%end%>
-        </div>
-    <%end%>
+       <% @followers_list.each do |follower_obj| %>
+         <p>This is a follower</p>
+         <p><%= follower_obj["fan_displayname"] %></p>
+       <%end%>
 </div>

@@ -62,22 +62,119 @@ module Sinatra
     
     
                     app.get '/following' do
+
                         start = Time.now.to_i
-                        authenticate!
-                        @user = User.find_by(username: session[:user].username)
-                        erb(:following)
+
+                        user_id = params[:user_id]
+                        uid = params[:uid]
+
+                        redis_obj = settings.redis_instance
+                        logger_obj = settings.logger_instance
+
+                        input_user_id = nil
+
+                        if (user_id == nil)
+                            authenticate!
+                            input_user_id = params[:uid]
+                        else   
+                            input_user_id = params[:user_id]
+                        end
+
+                        if (redis_obj.get("userfollowingobjectlistbyuserid#{input_user_id.to_s}") == nil)
+
+                            following_list_active_record = User.where(id: input_user_id)[0].fan_followings
+
+                            prepared_following_list = []
+
+                            following_list_active_record.each do |following_obj|
+
+                                prepared_following_obj = {
+                                    
+                                    "star_username" => following_obj.star.username,
+                                    "star_displayname" => following_obj.star.display_name,
+    
+                                }
+
+                                prepared_following_list.push(prepared_following_obj)
+
+                            end
+
+                            redis_obj.set("userfollowingobjectlistbyuserid#{input_user_id.to_s}", prepared_following_list.to_json)
+
+                            @followings_list = prepared_following_list
+                            
+                            string = "checkpoint"
+                        else
+
+                            cached_following_list = redis_obj.get("userfollowingobjectlistbyuserid#{input_user_id.to_s}")
+
+                            @followings_list = JSON.parse(cached_following_list)
+
+                        end
+
                         end_time = Time.now.to_i
-                        logger.info("Route: /following Time: " + (end_time-start)) 
+                        logger.info("Route: /following Time: " + (end_time-start).to_s) 
+                        erb(:following)
                         
                     end
     
                     app.get '/followers' do  #protected 
+
+                        # need a userfollowingobjectlistbyuserid
+
+                        # need a userfollowerobjectlistbyuserid
+
+                        user_id = params[:user_id]
+                        uid = params[:uid]
+
+                        redis_obj = settings.redis_instance 
+                        logger_obj = settings.logger_instance 
+
                         start = Time.now.to_i
-                        authenticate!
-                        @user = User.find_by(username: session[:user].username)
-                        erb(:followers)
+                        input_user_id = nil
+
+                        if (user_id == nil)
+                            authenticate!
+                            input_user_id = params[:uid]
+                        else   
+                            input_user_id = params[:user_id]
+                        end
+
+                        if (redis_obj.get("userfollowerobjectlistbyuserid#{input_user_id.to_s}") == nil)
+
+                            follower_list_active_record = User.where(id: input_user_id)[0].star_followings
+
+                            prepared_follower_list = []
+
+                            follower_list_active_record.each do |follower_obj|
+
+                                prepared_follower_obj = {
+                                    
+                                    "fan_username" => follower_obj.fan.username,
+                                    "fan_displayname" => follower_obj.fan.display_name,
+    
+                                }
+
+                                prepared_follower_list.push(prepared_follower_obj)
+
+                            end
+
+                            redis_obj.set("userfollowerobjectlistbyuserid#{input_user_id.to_s}", prepared_follower_list.to_json)
+
+                            @followers_list = prepared_follower_list
+                            
+                            string = "checkpoint"
+                        else
+
+                            cached_follower_list = redis_obj.get("userfollowerobjectlistbyuserid#{input_user_id.to_s}")
+
+                            @followers_list = JSON.parse(cached_follower_list)
+
+                        end
+
                         end_time = Time.now.to_i
-                        logger.info("Route: /followers Time: " + (end_time-start)) 
+                        logger.info("Route: /followers Time: " + (end_time-start).to_s) 
+                        erb(:followers)
                     end
 
                 end
