@@ -41,7 +41,7 @@ module Sinatra
 
                         if (!redis_obj.get("phrase-#{query_phrase.to_s}"))
 
-                            @tweets = Tweet.select{|x| x.text[query_phrase] != nil}
+                            @tweets = Tweet.where('text LIKE ?', "%#{query_phrase.to_s}%").limit(50)
 
                             @tweets.each do |tweet_entry|
 
