@@ -15,7 +15,7 @@ module Sinatra
                         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
                         authenticate!
                         end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        @logger.info "#{session[:user].id} was authenticated in #{end_time - start_time}"
+                        @logger.info "#{session[:user]["id"]} was authenticated in #{end_time - start_time}"
                         erb(:explore)
                     end
                 

@@ -21,12 +21,18 @@ module Sinatra
                     app.get '/innersigninpost' do 
                         @logger = Logger.new($stdout)
 
+                        puts "These are the params"
+                        redis_obj = settings.redis_instance 
+    
+                        param_obj = params
+
+
                         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        if user = User.authenticate(params)
+                        if user = User.authenticate(params, redis_obj)
                             puts user
-                            session[:user] = User.find_by(username:user.username) #user.authenticate does not return the full user from the database
+                            session[:user] = user #user.authenticate does not return the full user from the database
                             end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                            @logger.info "User #{session[:user].id} was authenticated in #{end_time - start_time} units"
+                            @logger.info "User #{session[:user]["id"]} was authenticated in #{end_time - start_time} units"
                             redirect_to_original_request
                         else
                             flash[:danger] = "Sign in failed. Incorrect username or password"

@@ -106,6 +106,7 @@ class SimpleApp < Sinatra::Base
             end
         else
             authenticate! 
+
         end 
 
         retrieved_followings = nil
@@ -115,9 +116,9 @@ class SimpleApp < Sinatra::Base
         @cur_user = nil
         @feed = []
 
-        if (!settings.redis_instance.get("user#{params[:user_id]}followinglist"))
+        if (!settings.redis_instance.get("user#{session[:user]["id"].to_s}followinglist"))
 
-            @cur_user = User.find(params[:user_id].to_i);
+            @cur_user = User.find(session[:user]["id"].to_i);
             @feed = []
 
             if (@cur_user.fan_followings != nil)
@@ -128,10 +129,10 @@ class SimpleApp < Sinatra::Base
                 end
             end
 
-            settings.redis_instance.set("user#{params[:user_id]}followinglist", followings.to_json)
+            settings.redis_instance.set("user#{session[:user]["id"].to_s}followinglist", followings.to_json)
 
         else
-            cached_following_list = settings.redis_instance.get("user#{params[:user_id]}followinglist")
+            cached_following_list = settings.redis_instance.get("user#{session[:user]["id"].to_s}followinglist")
             retrieved_followings = JSON.parse(cached_following_list)
             followings = retrieved_followings
         end
@@ -141,7 +142,7 @@ class SimpleApp < Sinatra::Base
 
         @tweets = []
 
-        if (!settings.redis_instance.get("user#{params[:user_id]}feedtweets"))
+        if (!settings.redis_instance.get("user#{session[:user]["id"].to_s}feedtweets"))
 
             @tweets = Tweet.all # create user feed
             @tweets.each do |tweet|
@@ -153,16 +154,16 @@ class SimpleApp < Sinatra::Base
                 end
             end
 
-            settings.redis_instance.set("user#{params[:user_id]}feedtweets", @feed.to_json)
+            settings.redis_instance.set("user#{session[:user]["id"].to_s}feedtweets", @feed.to_json)
 
         else
-            cached_tweets = settings.redis_instance.get("user#{params[:user_id]}feedtweets")
+            cached_tweets = settings.redis_instance.get("user#{session[:user]["id"].to_s}feedtweets")
             if (cached_tweets != 'null')
                 @feed = JSON.parse(cached_tweets)
             end
         end
 
-        settings.logger_instance.info "#{params[:user_id]} has the following feed object: #{@feed.to_s}"
+        settings.logger_instance.info "#{session[:user]["id"].to_s} has the following feed object: #{@feed.to_s}"
 
         erb(:home)
     end

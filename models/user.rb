@@ -24,24 +24,55 @@ class User < ActiveRecord::Base
     include BCrypt
     #attr_reader :name
   
-    def self.authenticate(params = {})
+    def self.authenticate(params = {}, redis_parameter)
       #puts  params
       return nil if params[:username].blank? || params[:password].blank?
   
       # #<GET USERNAME AND PASSWORD FROM DATABASE HERE>
       #user_name = "@#{params[:username]}"
-      userInfo = User.find_by(username:params[:username]) 
-      #puts userInfo[:password]
 
-      if (userInfo)
-        user_password = userInfo[:password]
-        user_name = userInfo[:username]
+      user_obj = nil
+
+      if (redis_parameter.get("userbyusername#{params[:username].to_s}") == nil)
+
+        raw_user_obj = User.find_by(username:params[:username])
+
+        prepared_user_obj = {
+          "id" => raw_user_obj.id,
+          "username" => raw_user_obj.username,
+          "display_name" => raw_user_obj.display_name,
+          "email" => raw_user_obj.email,
+          "password" => raw_user_obj.password,
+          "active" => raw_user_obj.active
+        }
+
+        string = "another checkpoint"
+
+        redis_parameter.set("userbyusername#{params[:username].to_s}", prepared_user_obj.to_json)
+
+        user_obj = prepared_user_obj
+
+      else
+
+        cached_user_obj = redis_parameter.get("userbyusername#{params[:username].to_s}")
+        user_obj = JSON.parse(cached_user_obj)
+
+      end
+
+      string = "checkpoint"
+
+
+      if (user_obj)
+        user_password = user_obj["password"]
+        user_name = user_obj["username"]
 
         username = params[:username].downcase
         return nil if username != user_name
     
         password_hash = Password.new(user_password)
-        User.new(username: username) if password_hash  == params[:password] # The password param gets hashed for us by ==
+
+        string = "another checkpoint"
+        user_obj if password_hash  == params[:password] # The password param gets hashed for us by ==
       else
         return nil
       end
