@@ -4,7 +4,13 @@ module Sinatra
             module Search
 
                 def self.registered(app)
+
                     app.get '/search' do     #protected 
+
+
+                        puts "this is the search route"
+
+
                         @logger = Logger.new($stdout)
                         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
                         authenticate!
@@ -14,13 +20,58 @@ module Sinatra
                     end
                 
                     app.get '/search/:phrase' do
+
                         @logger = Logger.new($stdout)
-                        authenticate!
+
+                        redis_obj = settings.redis_instance 
+                        logger_obj = settings.logger_instance 
+
+                        @user_id = params[:user_id].to_s
+
+                        if (@user_id == nil)
+                            authenticate!
+                            @user_id = session[:user].id
+                        end
+
                         query_phrase = params[:phrase]
                         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        @tweets = Tweet.select{|x| x.text[query_phrase] != nil}
+                        @tweets = []
+
+                        adjusted_tweets = []
+
+                        if (!redis_obj.get("phrase-#{query_phrase.to_s}"))
+
+                            @tweets = Tweet.select{|x| x.text[query_phrase] != nil}
+
+                            @tweets.each do |tweet_entry|
+
+                                adjusted_tweet_hash = {
+
+                                    "id" => tweet_entry.id,
+                                    "text" => tweet_entry.text,
+                                    "user_display_name" => tweet_entry.user.display_name,
+                                    "user_user_name" => tweet_entry.user.username,
+                                    "tweet_reply_length" => tweet_entry.tweets.length,
+                                    "tweet_likes_length" => tweet_entry.likes.length,
+                                    "tweet_retweet_length" => tweet_entry.retweets.length
+                                }
+
+                                adjusted_tweets.push(adjusted_tweet_hash)
+
+                            end
+
+                            @tweets = adjusted_tweets
+
+                            redis_obj.set("phrase-#{query_phrase.to_s}", @tweets.to_json)
+
+                        else
+
+                            cached_tweet_results = redis_obj.get("phrase-#{query_phrase.to_s}")
+                            @tweets = JSON.parse(cached_tweet_results)
+
+                        end
                         end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        @logger.info "User #{session[:user].id} searched for tweets in #{end_time - start_time} time units"
+                        @logger.info "User #{@user_id} searched for tweets in #{end_time - start_time} time units"
                         erb(:exploreresults)
                     end
     
