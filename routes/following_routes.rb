@@ -120,10 +120,6 @@ module Sinatra
     
                     app.get '/followers' do  #protected 
 
-                        # need a userfollowingobjectlistbyuserid
-
-                        # need a userfollowerobjectlistbyuserid
-
                         user_id = params[:user_id]
                         uid = params[:uid]
 
