@@ -19,7 +19,7 @@ module Sinatra
                         erb(:explore)
                     end
                 
-                    app.get '/search/:phrase' do
+                    app.get '/search' do
 
                         @logger = Logger.new($stdout)
 
