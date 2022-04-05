@@ -1,14 +1,14 @@
 <head>
-    <title>Nanotwitter | <%= @user.username%></title>
+    <title>Nanotwitter | <%= @user["username"]%></title>
     <link rel="stylesheet" type="text/css" href="/styles/profile.css">
 </head>
 <div class="profile">
     <div class="user-info">
-        <h2><%= @user.display_name%></h2>
-        <p><%= @user.username%></p>
+        <h2><%= @user["display_name"]%></h2>
+        <p><%= @user["username"]%></p>
         <div class="user-followings">
-            <a href="/followers"><%= @user.star_followings.count%> Followers</a>
-            <a href="/following"><%= @user.fan_followings.count%> Followings </a>
+            <a href="/followers"><%= @userstarfollowingcount%> Followers</a>
+            <a href="/following"><%= @userfanfollowingcount%> Followings </a>
         </div>
         <% if @user == session[:user]%>
             <button class="btn btn-warning">edit profile</button>
@@ -17,14 +17,14 @@
         <%end%>
     </div>
     <div class="user-tweets">
-        <% if @user.tweets.size == 0%>
+        <% if @usertweets.count %>
             <p>User has no tweets!</p>
         <%else%>
-            <% @user.tweets.each do |tweet|%>
+            <% @usertweets.each do |tweet|%>
                     <div class="tweet">
-                        <p><span class="fw-bold"><%=tweet.user.display_name%></span> <%= tweet.user.username%></p>
-                        <p><%= tweet.text%></p>
-                        <p><i class="bi bi-heart"></i> <%= tweet.likes.length%> <i class="bi bi-arrow-repeat"></i> <%= tweet.retweets.length%></p> 
+                        <p><span class="fw-bold"><%=@user["display_name"]%></span> <%= @user["username"]%></p>
+                        <p><%= tweet["text"]%></p>
+                        <p><i class="bi bi-heart"></i> <%= tweet["tweet_likes_length"] %> <i class="bi bi-arrow-repeat"></i> <%= tweet["tweet_retweets_length"]%></p> 
                     </div>
             <%end%>
              

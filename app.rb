@@ -165,6 +165,9 @@ class SimpleApp < Sinatra::Base
 
         settings.logger_instance.info "#{session[:user]["id"].to_s} has the following feed object: #{@feed.to_s}"
 
+        @user_id = session[:user]["id"].to_s
+        @user_name = session[:user]["username"].to_s
+
         erb(:home)
     end
 

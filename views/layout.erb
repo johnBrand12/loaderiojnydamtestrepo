@@ -24,7 +24,7 @@
                         <a href="/search" class="side-nav-item <%= 'active-nav-item' if request.path_info=='/search'%>"><i class="bi bi-search"></i> Explore</a>
                         <a href="/people" class="side-nav-item <%= 'active-nav-item' if request.path_info=='/people'%>"><i class="bi bi-people-fill"></i> People</a>
                         <a href="/notifications" class="side-nav-item <%= 'active-nav-item' if request.path_info=='/notifications'%>"><i class="bi bi-bell"></i> Notifications</a>
-                        <a href="/user/<%= @user_id %>" class="side-nav-item"><i class="bi bi-person"></i> Profile</a>
+                        <a href="/user/<%= @user_name %>" class="side-nav-item"><i class="bi bi-person"></i> Profile</a>
                 </div>
                 <div class="controls">
                       <button class="btn btn-primary create" data-bs-toggle="modal" data-bs-target="#createTweetModal">Create Tweet</button>

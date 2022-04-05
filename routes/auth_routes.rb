@@ -76,13 +76,122 @@ module Sinatra
                     app.get '/user/:name' do #protected
 
                         @logger = Logger.new($stdout)
+
+                        redis_obj = settings.redis_instance 
+
                         start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        if (params[:user_id] != nil)   
-                            session[:user] = User.find(params[:user_id].to_i)
+                        if (params[:user_id] != nil && redis_obj.get("userbyid#{params[:user_id].to_s}") != nil)   
+                            cached_user_obj = redis_obj.get("userbyid#{params[:user_id].to_s}")
+                            session[:user] = JSON.parse(cached_user_obj)
                         else
                             authenticate! 
                         end 
-                        @user = User.find_by(username:params[:name])
+
+                        user_active_record = nil
+
+                        if (redis_obj.get("userbyusername#{params[:name].to_s}") == nil)
+                            
+                            user_active_record = User.find_by(username:params[:name])
+
+                            string = "checkpoint"
+                            
+                            prepared_user_obj = {
+                                "id" => user_active_record.id,
+                                "username" => user_active_record.username,
+                                "display_name" => user_active_record.display_name,
+                                "email" => user_active_record.email,
+                                "active" => user_active_record.active
+                            }
+
+                            redis_obj.set("userbyusername#{params[:name].to_s}", prepared_user_obj.to_json)
+                            @user = prepared_user_obj
+
+                        else
+
+                            cached_user_obj = redis_obj.get("userbyusername#{params[:name].to_s}")
+                            @user = JSON.parse(cached_user_obj)
+
+                        end
+
+                        string = "breakpoint"
+
+                        # dealing with the star following count cache 
+                        if (redis_obj.get("userstarfollowingcountbyid#{@user["id"]}") == nil)
+
+
+                            star_following_count = User.find_by(username:params[:name]).star_followings.count
+                            redis_obj.set("userstarfollowingcountbyid#{@user["id"]}", star_following_count.to_s)
+                            @userstarfollowingcount = star_following_count
+
+                        else
+
+                            star_following_count = redis_obj.get("userstarfollowingcountbyid#{@user["id"]}")
+                            @userstarfollowingcount = star_following_count
+
+                        end
+
+                        string = "checkpoint"
+
+
+                        # dealing with the user fan following count cache 
+
+                        if (redis_obj.get("userfanfollowingcountbyid#{@user["id"]}") == nil)
+
+
+                            fan_following_count = User.find_by(username:params[:name]).fan_followings.count
+                            redis_obj.set("userfanfollowingcountbyid#{@user["id"]}", fan_following_count.to_s)
+                            @userfanfollowingcount = fan_following_count
+
+                        else
+
+                            fan_following_count = redis_obj.get("userfanfollowingcountbyid#{@user["id"]}")
+                            @userfanfollowingcount = fan_following_count
+
+                        end
+
+                        string = "breakpoint"
+
+                        # dealing with the initial user tweet list cache
+
+                        if (redis_obj.get("usertweetlistbyid#{@user["id"]}") == nil)
+
+                            user_tweet_list_active_record = User.find_by(username:params[:name]).tweets
+
+                            prepared_tweet_list = []
+
+                            user_tweet_list_active_record.each do |tweet|
+
+                                tweet_likes_length = tweet.likes.length
+                                tweet_retweets_length = tweet.retweets.length
+
+
+                                tweet_obj = {
+                                    "id" => tweet.id,
+                                    "text" => tweet.text,
+                                    "user_id" => tweet.user_id,
+                                    "tweet_id" => tweet.tweet_id,
+                                    "created_at" => tweet.created_at,
+                                    "updated_at" => tweet.updated_at,
+                                    "tweet_likes_length" => tweet_likes_length.to_s,
+                                    "tweet_retweets_length" => tweet_retweets_length.to_s
+                                }
+
+                                prepared_tweet_list.push(tweet_obj)
+
+                            end
+
+                            redis_obj.set("usertweetlistbyid#{@user["id"]}", prepared_tweet_list.to_json)
+                            @usertweets = prepared_tweet_list
+
+                        else
+
+                            cached_user_tweets = redis_obj.get("usertweetlistbyid#{@user["id"]}")
+                            @usertweets = JSON.parse(cached_user_tweets)
+
+                        end
+
+                        string = "breakpoint"
+
                         end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
                         @logger.info "Route: /user/:name  Time: #{end_time-start}"
                         erb(:profile)
