@@ -1,20 +1,30 @@
 <head>
     <title>Nanotwitter | Following</title>
-    <link rel="stylesheet" type="text/css" href="/styles/user.css">
+    <link rel="stylesheet" type="text/css" href="/styles/following.css">
 </head>
 
-<div class="content">
+<div class="fllwing-main-content">
         <% flash.keys.each do |type|%>
             <div class="alert alert-<%=type%>">
                 <%= flash[type]%>
             </div>
         <% end%>
-    <h1>  <%= session[:user]["username"]%>  Following </h1>
+    <h1>  <%= session[:user]["username"]%> Followings </h1>
     <br>
     <br>
        <% @followings_list.each do |fan_following| %>
-            <p>This is a following</p>
-            <p><%= fan_following["star_displayname"] %>
+            <div class="fllwing-following-container">
+            <div class='fllwing-detail-text-column'>
+                <span>Display Name: <%= fan_following["star_displayname"] %></span>
+                <span>Username: <%= fan_following["star_username"]%></span>
+            </div>
+            <div class="fllwing-button-column">
+               <button 
+                clientId="<%= session[:user]["id"]%>" 
+                id="<%= fan_following["star_id"] %>" 
+                class="fllwing-unfollow-button">Unfollow</button>
+            </div>
+            </div>
         <%end%>
 </div>
 

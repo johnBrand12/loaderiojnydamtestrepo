@@ -1,9 +1,9 @@
 <head>
     <title>Nanotwitter | Followers</title>
-    <link rel="stylesheet" type="text/css" href="/styles/user.css">
+    <link rel="stylesheet" type="text/css" href="/styles/following.css">
 </head>
 
-<div class="content">
+<div class="fllwer-main-content">
         <% flash.keys.each do |type|%>
             <div class="alert alert-<%=type%>">
                 <%= flash[type]%>
@@ -12,7 +12,11 @@
     <h1> <%= session[:user]["username"]%> Followers</h1>
     <br>
        <% @followers_list.each do |follower_obj| %>
-         <p>This is a follower</p>
-         <p><%= follower_obj["fan_displayname"] %></p>
+            <div class="fllwer-follower-container">
+                <div class='fllwer-detail-text-column'>
+                    <span>Display Name: <%= follower_obj["fan_displayname"] %></span>
+                    <span>Username: <%= follower_obj["fan_username"]%></span>
+                </div>
+            </div>
        <%end%>
 </div>

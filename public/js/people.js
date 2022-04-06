@@ -11,17 +11,9 @@ friendSearchButton.addEventListener('click', async () => {
 
     const user = friendSearchInput.value;
 
-    console.log("You pressed the search button!");
-
-
     let followingListCacheList = await fetch(`http://localhost:4567/following/retrievelistcache?uid=67`)
 
     let followingListCacheListJson = await followingListCacheList.json();
-
-    console.log("We have first received the following cache list");
-    console.log("Attache dis the following cache list");
-
-    console.log(followingListCacheListJson);
 
     fetch(`http://localhost:4567/search/friends/${user}`)
     .then((res) => res.json())
@@ -35,10 +27,34 @@ friendSearchButton.addEventListener('click', async () => {
         [...res].forEach((element) => {
 
 
-            let elem = followingListCacheListJson.filter((iterative) => iterative.star_displayname === element.display_name)
+            let elem = followingListCacheListJson.filter((iterative) => {
+
+                console.log("This is the iterative object");
+                console.log(iterative);
+
+                return iterative.star_displayname === element.display_name;
+
+            });
+
+            let dynamicFollowButtonClass;
+            let dynamicFollowButtonText;
+            let dynamicUnFollowButtonDisabledFlag;
+            let dynamicFollowButtonDisabledFlag;
 
             if (elem.length != 0) {
-                
+
+                dynamicFollowButtonClass = "ppl-follow-button-type ppl-follow ppl-follow-black-white";
+                dynamicFollowButtonText = "Followed";
+                dynamicUnFollowButtonDisabledFlag = "";
+                dynamicFollowButtonDisabledFlag = "disabled";
+
+            } else {
+
+                dynamicFollowButtonClass = "ppl-follow-button-type ppl-follow";
+                dynamicFollowButtonText = "Follow";
+                dynamicUnFollowButtonDisabledFlag = "disabled";
+                dynamicFollowButtonDisabledFlag = "";
+
             }
 
             let newSearchResultComp = `<div class="ppl-search-result-component" id=${element.id}>
@@ -49,8 +65,8 @@ friendSearchButton.addEventListener('click', async () => {
                         <span>${element.display_name}</span>
                     </div>
                     <div class="ppl-button-container">
-                        <button class="ppl-follow-button-type ppl-follow">Follow</button>
-                        <button disabled class="ppl-follow-button-type ppl-unfollow">Unfollow</button>
+                        <button ${dynamicFollowButtonDisabledFlag} class="${dynamicFollowButtonClass}">${dynamicFollowButtonText}</button>
+                        <button ${dynamicUnFollowButtonDisabledFlag} class="ppl-follow-button-type ppl-unfollow">Unfollow</button>
                     </div>
                 </div>`;
 
@@ -64,16 +80,9 @@ friendSearchButton.addEventListener('click', async () => {
 
             elem.addEventListener('click',(e)=>{
 
-
-                console.log("You just pressed the follow button!");
-                console.log("And this is the event information");
-
                 const localUserId = e.target.parentNode.parentNode.getAttribute('id');
 
                 const localUserDisplayName = e.target.parentNode.parentNode.querySelector('.ppl-friend-name-container').textContent.trim();
-
-                console.log(localUserDisplayName);
-                console.log(localUserId);
 
                 const options = {
                     method: 'POST',
@@ -112,12 +121,8 @@ friendSearchButton.addEventListener('click', async () => {
 
             elem.addEventListener('click',(e)=>{
 
-                console.log("You just pressed the unfollow button!");
-                console.log("And this is the event information");
-
                 const localUserDisplayName = e.target.parentNode.parentNode.querySelector('.ppl-friend-name-container').textContent.trim();
 
-                console.log(localUserDisplayName);
             });
 
         });

@@ -5,6 +5,7 @@ module Sinatra
                 def self.registered(app) 
 
                     app.get '/updatefollowing/:fanfollowing' do
+                        authenticate!
                         start = Time.now.to_i
                         following = Following.find_by(id: params[:fanfollowing]) 
 
@@ -20,6 +21,7 @@ module Sinatra
 
                     app.get '/following/retrievelistcache' do
 
+                        authenticate!
                         local_uid = params[:uid]
 
                         redis_obj = settings.redis_instance
@@ -35,6 +37,7 @@ module Sinatra
 
                                 prepared_following_obj = {
                                     
+                                    "star_id" => following_obj.star.id,
                                     "star_username" => following_obj.star.username,
                                     "star_displayname" => following_obj.star.display_name,
     
@@ -50,10 +53,16 @@ module Sinatra
                         end
                     end
 
+                    app.post '/removefollowingservice' do
+
+                        # TODO for when the user presses the unfollow button on the people page
+
+                    end
+
                     app.post '/insertfollowingservice' do
 
 
-
+                        authenticate!
                         # This endpoint will assume on the frontend that you can't
                         # follow someone that is already in the database cache, it will be clear
 
@@ -80,6 +89,7 @@ module Sinatra
 
                                 prepared_following_obj = {
                                     
+                                    "star_id" => following_obj.star.id,
                                     "star_username" => following_obj.star.username,
                                     "star_displayname" => following_obj.star.display_name,
     
@@ -100,6 +110,8 @@ module Sinatra
                         if (following) 
 
                             following_obj = {
+
+                                "star_id" => following.star.id,
                                 "star_username" => following.star.username,
                                 "star_displayname" => following.star.display_name,
                             }
@@ -119,7 +131,58 @@ module Sinatra
 
                     # The /updatefollowers service endpoint but in the form of a service returning json
                 
-                    app.get '/updatefollowers/:fanfollowing' do
+                    app.post '/updatefollowings/:fan_id/:star_id/:action' do
+
+                        authenticate!
+
+
+                        redis_obj = settings.redis_instance
+                        logger_obj = settings.logger_instance
+
+
+                        fan_id_param = params[:fan_id].to_i
+                        star_id_param = params[:star_id].to_i
+                        action_param = params[:action].to_s
+
+                        if (action_param == "unfollow")
+
+                            follow_destory_result = Following.where(star_id: star_id_param, fan_id: fan_id_param).destroy
+
+                            if (follow_destory_result)
+
+                                # update cache to reflect change
+
+                                cached_following_list = JSON.parse(redis_obj.get("userfollowingobjectlistbyuserid#{fan_id_param.to_s}"))
+
+                                local_delete_target = nil
+
+                                cached_following_list.each_with_index do |following_entry, index|
+
+                                    if (following_entry["star_id"] == star_id_param)
+
+                                        local_delete_target = index
+                                    end
+                                end
+
+                                if (local_delete_target != nil)
+                                    cached_following_list.delete_at(local_delete_target)
+                                end
+
+                                redis_obj.set("userfollowingobjectlistbyuserid#{fan_id_param.to_s}", cached_following_list.to_json)
+
+                            else
+                                400
+                            end
+
+
+                        else
+
+                            ## handling the case when the user wants to follow the follower 
+
+                            ## TODO
+
+                        end
+                        
                         start = Time.now.to_i
                         following = Following.find_by(id: params[:fanfollowing])
                         if(following.fan_active == true)
@@ -170,6 +233,7 @@ module Sinatra
 
                                 prepared_following_obj = {
                                     
+                                    "star_id" => following_obj.star.id,
                                     "star_username" => following_obj.star.username,
                                     "star_displayname" => following_obj.star.display_name,
     
@@ -226,6 +290,7 @@ module Sinatra
 
                                 prepared_follower_obj = {
                                     
+                                    "fan_id" => follower.obj.fan.id,
                                     "fan_username" => follower_obj.fan.username,
                                     "fan_displayname" => follower_obj.fan.display_name,
     
