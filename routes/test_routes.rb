@@ -135,8 +135,7 @@ module Sinatra
 
                                     new_follow_relation = Following.create(
                                         star_id: follow_relation["star_id"],
-                                        fan_id: follow_relation["fan_id"],
-                                        fan_active: true
+                                        fan_id: follow_relation["fan_id"]
                                     )
 
                                     new_follow_relations.append(new_follow_relation)

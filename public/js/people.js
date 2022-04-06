@@ -7,11 +7,21 @@ const userListResultContainer = document.querySelector('.ppl-search-component-co
 const followButton = document.querySelector('.ppl-follow');
 const unfollowButton = document.querySelector('.ppl-unfollow');
 
-friendSearchButton.addEventListener('click', () => {
+friendSearchButton.addEventListener('click', async () => {
 
     const user = friendSearchInput.value;
 
     console.log("You pressed the search button!");
+
+
+    let followingListCacheList = await fetch(`http://localhost:4567/following/retrievelistcache?uid=67`)
+
+    let followingListCacheListJson = await followingListCacheList.json();
+
+    console.log("We have first received the following cache list");
+    console.log("Attache dis the following cache list");
+
+    console.log(followingListCacheListJson);
 
     fetch(`http://localhost:4567/search/friends/${user}`)
     .then((res) => res.json())
@@ -24,6 +34,13 @@ friendSearchButton.addEventListener('click', () => {
 
         [...res].forEach((element) => {
 
+
+            let elem = followingListCacheListJson.filter((iterative) => iterative.star_displayname === element.display_name)
+
+            if (elem.length != 0) {
+                
+            }
+
             let newSearchResultComp = `<div class="ppl-search-result-component" id=${element.id}>
                     <div class="ppl-image-container">
                         <img class="ppl-twitterlogo" src="twitterlogo.png"/>
@@ -33,7 +50,7 @@ friendSearchButton.addEventListener('click', () => {
                     </div>
                     <div class="ppl-button-container">
                         <button class="ppl-follow-button-type ppl-follow">Follow</button>
-                        <button class="ppl-follow-button-type ppl-unfollow">Unfollow</button>
+                        <button disabled class="ppl-follow-button-type ppl-unfollow">Unfollow</button>
                     </div>
                 </div>`;
 
@@ -71,6 +88,17 @@ friendSearchButton.addEventListener('click', () => {
 
                     console.log("we got to the insert following resolution");
                     console.log(res);
+
+                    console.log("We need to perform an operation on the below button");
+                    console.dir(e.target);
+
+                    e.target.className += " ppl-follow-black-white"
+                    e.target.innerHTML = "Followed";
+                    e.target.disabled = true;
+
+                    const adjacentUnFollowButton = e.target.parentNode.querySelector('.ppl-unfollow');
+
+                    adjacentUnFollowButton.disabled = false;
                 })
                 .catch((err) => {
 

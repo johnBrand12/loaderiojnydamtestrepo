@@ -10,14 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_03_10_145903) do
+ActiveRecord::Schema[7.0].define(version: 2022_02_12_225106) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "followings", force: :cascade do |t|
     t.integer "star_id"
     t.integer "fan_id"
-    t.boolean "fan_active", default: true
   end
 
   create_table "hashtags", force: :cascade do |t|

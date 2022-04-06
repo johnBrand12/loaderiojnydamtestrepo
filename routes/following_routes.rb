@@ -18,23 +18,103 @@ module Sinatra
                         redirect '/following'
                     end
 
-                    app.post '/insertfollowingservice' do
-                        start = Time.now.to_i
-                        req_body = JSON.parse(request.body)
+                    app.get '/following/retrievelistcache' do
 
-                        following = Following.create(star_id: req_body["star_id"].to_i , fan_id: session[:user].id , fan_active: true)
+                        local_uid = params[:uid]
 
-                        if (following) 
-                            result_object = {
-                                following_id: following.id
-                            }
-                            result_object.to_json
+                        redis_obj = settings.redis_instance
+                        logger_obj = settings.logger_instance
+
+                        if (redis_obj.get("userfollowingobjectlistbyuserid#{session[:user]["id"].to_s}") == nil)
+
+                            following_list_active_record = User.where(id: session[:user]["id"])[0].fan_followings
+
+                            prepared_following_list = []
+
+                            following_list_active_record.each do |following_obj|
+
+                                prepared_following_obj = {
+                                    
+                                    "star_username" => following_obj.star.username,
+                                    "star_displayname" => following_obj.star.display_name,
+    
+                                }
+
+                                prepared_following_list.push(prepared_following_obj)
+                            end
+                            return prepared_following_list.to_json
                         else
-                            400
+                            cached_followings = redis_obj.get("userfollowingobjectlistbyuserid#{session[:user]["id"].to_s}")
+                            prepared_following_list = JSON.parse(cached_followings)
+                            return prepared_following_list.to_json
+                        end
+                    end
+
+                    app.post '/insertfollowingservice' do
+
+
+
+                        # This endpoint will assume on the frontend that you can't
+                        # follow someone that is already in the database cache, it will be clear
+
+                        redis_obj = settings.redis_instance
+                        logger_obj = settings.logger_instance
+
+
+                        start = Time.now.to_i
+
+                        session_var = session[:user]
+
+
+                        req_body = JSON.parse(request.body.string)
+
+                        if (redis_obj.get("userfollowingobjectlistbyuserid#{session[:user]["id"].to_s}") == nil)
+
+                            # reconstructing cache from database which hopefully happens rarely
+
+                            following_list_active_record = User.where(id: session[:user]["id"])[0].fan_followings
+
+                            prepared_following_list = []
+
+                            following_list_active_record.each do |following_obj|
+
+                                prepared_following_obj = {
+                                    
+                                    "star_username" => following_obj.star.username,
+                                    "star_displayname" => following_obj.star.display_name,
+    
+                                }
+
+                                prepared_following_list.push(prepared_following_obj)
+                            end
+                        else
+                            cached_followings = redis_obj.get("userfollowingobjectlistbyuserid#{session[:user]["id"].to_s}")
+                            prepared_following_list = JSON.parse(cached_followings)
+
                         end
 
-                        end_time = Time.now.to_i
-                        logger.info("Route: /insertfollowingservice Time: " + (end_time-start))
+
+                        # inserting the new following into the database as well as into the cache 
+                        following = Following.create(star_id: req_body["star_id"].to_i , fan_id: session[:user]["id"])
+
+                        if (following) 
+
+                            following_obj = {
+                                "star_username" => following.star.username,
+                                "star_displayname" => following.star.display_name,
+                            }
+    
+                            prepared_following_list.push(following_obj)
+
+                            redis_obj.set("userfollowingobjectlistbyuserid#{session[:user]["id"].to_s}", prepared_following_list.to_json)
+                            end_time = Time.now.to_i
+                            logger.info("Route: /insertfollowingservice Time: " + (end_time-start).to_s)
+                            prepared_following_list.to_json
+                        else
+                            end_time = Time.now.to_i
+                            logger.info("Route: /insertfollowingservice Time: " + (end_time-start).to_s)
+                            400
+                        end
                     end
 
                     # The /updatefollowers service endpoint but in the form of a service returning json
