@@ -25,6 +25,8 @@ html {
     color: white;
     background-color: #1e9bf0;
     justify-content: space-between;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
 }
 
 .fllwing-button-column {

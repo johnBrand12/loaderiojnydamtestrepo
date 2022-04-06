@@ -12,11 +12,17 @@ html {
 }
 
 .tweet {
-    background-color: rgb(245, 245, 245);
+    background-color: #b3e5fc;
     padding: 10px;
     margin: 10px;
     border-radius: 20px;
     width: 500px;
+    transition: box-shadow 0.5s;
+    box-shadow: 0px 0px 0px black;
+}
+
+.tweet:hover {
+    box-shadow: 0px 0px 8px black;
 }
 
 .like {
@@ -80,4 +86,51 @@ html {
 .reply-thread {
 
     margin-left: 30px;
+}
+
+.hme-tweet-action-button {
+    border-style: none;
+    outline: none;
+    background-color: #b3e5fc;
+}
+
+.hme-reply-component-container {
+    margin-top: 0.6rem;
+    padding: 0.5rem;
+    background-color: white;
+    border-radius: 0.2rem;
+}
+
+.hme-replylist-container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.6rem;
+    padding: 0.5rem;
+    background-color: #f3f3f3;
+    border-radius: 0.2rem;
+}
+
+.hme-reply-input-container {
+    margin-top: 1rem;
+    outline-style: none;
+    border-style: none;
+}
+
+.hme-horizontal-vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+.hme-reply-submit-button {
+    margin-top: 1rem;
+    outline-style: none;
+    border-style: none;
+    background-color: #1e9bf0;
+    padding: 0.7rem;
+    border-radius: 0.2rem;
+    color: white;
+}
+
+.hme-reply-prompt-header {
+    margin-bottom: 4rem;
 }

@@ -7,13 +7,9 @@ Array.from(allReplyButtons).forEach((replyButtonElem) => {
 
     replyButtonElem.addEventListener('click', (e) => {
 
-        const tweetId = e.target.getAttribute('id');
+        e.preventDefault();
+        console.log("looks like you clicked the reply button!");
 
-        console.log("You clicked the reply button!");
-    
-        console.log("The reply tweet id is");
-    
-        console.log(tweetId);
 
     });
 
@@ -24,18 +20,14 @@ Array.from(allLikeButtons).forEach((likeButtonElem) => {
 
     likeButtonElem.addEventListener('click', (e) => {
 
+        e.preventDefault();
+
         console.dir(e.target);
 
-        const tweetId = e.target.getAttribute('id');
-        const clientId = e.target.getAttribute('clientid');
-    
-        console.log("You clicke dthe like button !");
-    
-        console.log("The like tweet id is");
-        console.log(tweetId);
-    
-        console.log("The client id is");
-        console.log(clientId);
+        const selectedTarget = e.target;
+
+        const tweetId = e.target.attributes[2].value;
+        const clientId = e.target.attributes[1].value;
     
         const options = {
             method: 'POST'
@@ -45,24 +37,11 @@ Array.from(allLikeButtons).forEach((likeButtonElem) => {
             .then((res) => res.json())
             .then((res) => {
     
-                console.log("The like request was received");
-    
-                console.log(res);
-    
-                console.dir(e.target.innerText);
-    
                 let prevLikeCount = parseInt(e.target.innerText.trim());
-    
-                console.log("The retrieved prevLike countis");
-                console.log(prevLikeCount);
-    
-    
+
                 prevLikeCount =  prevLikeCount +  1;
-    
-                console.log("This is the inputted prevLikeCount");
-                console.log(prevLikeCount);
-    
-                e.target.innerHTML = `<i class="bi bi-heart"> ${prevLikeCount}`;
+
+                e.target.innerHTML = `<i class="bi bi-heart"> ${prevLikeCount} `;
     
             })
             .catch((err) => {
@@ -70,22 +49,19 @@ Array.from(allLikeButtons).forEach((likeButtonElem) => {
                 console.log(err);
             console.log("There was an error with the like request")
             });
-    })
+})});
 
-});
 
+    // })
 
 
 Array.from(allRetweetButtons).forEach((retweetButtonElem) => {
 
     retweetButtonElem.addEventListener('click', (e) => {
+        e.preventDefault();
 
-        console.log("You clicked the retweet button !");
-
-        const tweetId = e.target.getAttribute('id');
-    
-        console.log("The retweet tweet id is");
-        console.log(tweetId);
+        const tweetId = e.target.getAttribute('id').value;
+        const clientId = e.target.getAttribute('clientid').value;
     
         const options = {
             method: 'POST'

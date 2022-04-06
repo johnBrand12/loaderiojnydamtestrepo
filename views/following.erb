@@ -14,16 +14,16 @@
     <br>
        <% @followings_list.each do |fan_following| %>
             <div class="fllwing-following-container">
-            <div class='fllwing-detail-text-column'>
-                <span>Display Name: <%= fan_following["star_displayname"] %></span>
-                <span>Username: <%= fan_following["star_username"]%></span>
-            </div>
-            <div class="fllwing-button-column">
-               <button 
-                clientId="<%= session[:user]["id"]%>" 
-                id="<%= fan_following["star_id"] %>" 
-                class="fllwing-unfollow-button">Unfollow</button>
-            </div>
+                <div class='fllwing-detail-text-column'>
+                    <span>Display Name: <%= fan_following["star_displayname"] %></span>
+                    <span>Username: <%= fan_following["star_username"]%></span>
+                </div>
+                <div class="fllwing-button-column">
+                <button 
+                    clientId="<%= session[:user]["id"]%>" 
+                    id="<%= fan_following["star_id"] %>" 
+                    class="fllwing-unfollow-button">Unfollow</button>
+                </div>
             </div>
         <%end%>
 </div>
