@@ -74,20 +74,11 @@ class SimpleApp < Sinatra::Base
     end
 
     get '/home' do 
-     #protected
-
-        puts 'this is the connection'
 
         redis_instance = settings.redis_instance
 
         
         if (params[:user_id] != nil) 
-
-            puts "The user id is #{params[:user_id]}"
-
-            # if (!redis.get(""))
-            #     session[:user] = User.find(params[:user_id].to_i)
-            # end
 
             if (!settings.redis_instance.get("user#{params[:user_id]}userobj"))
                 session[:user] = User.find(params[:user_id].to_i)
@@ -95,7 +86,6 @@ class SimpleApp < Sinatra::Base
                 cached_user_object = session[:user].to_json
 
                 settings.redis_instance.set("user#{params[:user_id]}userobj", cached_user_object)
-                puts "this is the session user"
                 session[:user] = JSON.parse(cached_user_object)
 
             else
@@ -137,8 +127,6 @@ class SimpleApp < Sinatra::Base
             followings = retrieved_followings
         end
 
-        ## assuming backend invalidation hasn't taken place yet
-
 
         @tweets = []
 
@@ -150,7 +138,20 @@ class SimpleApp < Sinatra::Base
                     if @feed.size == 50
                         break
                     end
-                    @feed.push(tweet)
+
+                    prepared_tweet_obj = {
+                        "id" => tweet.id,
+                        "text" => tweet.text,
+                        "user_id" => tweet.user_id,
+                        "display_name" => tweet.user.display_name,
+                        "user_name" => tweet.user.username,
+                        "tweet_id" => tweet.tweet_id,
+                        "tweet_likes_length" => tweet.likes.length,
+                        "tweet_retweets_length" =>  tweet.retweets.length,
+                        "tweet_replies_length" => tweet.tweets.length
+                    }
+
+                    @feed.push(prepared_tweet_obj)
                 end
             end
 
@@ -162,8 +163,6 @@ class SimpleApp < Sinatra::Base
                 @feed = JSON.parse(cached_tweets)
             end
         end
-
-        settings.logger_instance.info "#{session[:user]["id"].to_s} has the following feed object: #{@feed.to_s}"
 
         @user_id = session[:user]["id"].to_s
         @user_name = session[:user]["username"].to_s

@@ -8,9 +8,9 @@ Array.from(unfollowButtons).forEach((buttonElem) => {
 
         console.log("You pressed the unfollow button!");
 
-        const buttonId = e.target.getAttribute('id');
+        const buttonId = e.target.id;
 
-        const clientUserId = e.target.getAttribute('clientId');
+        const clientUserId = e.target.getAttribute('clientid');
 
         const userAction = "unfollow";
 
@@ -23,15 +23,16 @@ Array.from(unfollowButtons).forEach((buttonElem) => {
 
         console.log(`http://localhost:4567/updatefollowings/${clientUserId}/${buttonId}/${userAction}`);
 
-        // fetch(`http://localhost:4567/updatefollowings/${clientUserId}/${buttonId}/${userAction}`, options)
-        // .then((res) => {
-        //     console.log("User was unfollowed");
-        //     console.log(res);
-        // })
-        // .catch((err) => {
-        //     console.log("There was an issue unfollowing the user");
-        //     console.log(err);
-        // })
+        fetch(`http://localhost:4567/updatefollowings/${clientUserId}/${buttonId}/${userAction}`, options)
+        .then((res) => {
+            console.log("User was unfollowed");
+            console.log(res);
+            window.location.href = `/following?uid=${clientUserId}`;
+        })
+        .catch((err) => {
+            console.log("There was an issue unfollowing the user");
+            console.log(err);
+        })
 
     });
 })

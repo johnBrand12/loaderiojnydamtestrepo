@@ -66,6 +66,9 @@ module Sinatra
                         # This endpoint will assume on the frontend that you can't
                         # follow someone that is already in the database cache, it will be clear
 
+
+                        # Remember in these routes to update the fanfollowing cache count number as well
+
                         redis_obj = settings.redis_instance
                         logger_obj = settings.logger_instance
 
@@ -136,6 +139,7 @@ module Sinatra
                         authenticate!
 
 
+                        start_time = Time.now.to_i
                         redis_obj = settings.redis_instance
                         logger_obj = settings.logger_instance
 
@@ -146,7 +150,8 @@ module Sinatra
 
                         if (action_param == "unfollow")
 
-                            follow_destory_result = Following.where(star_id: star_id_param, fan_id: fan_id_param).destroy
+                            follow_destory_result = Following.where(star_id: star_id_param, fan_id: fan_id_param)[0].destroy
+
 
                             if (follow_destory_result)
 
@@ -169,12 +174,18 @@ module Sinatra
                                 end
 
                                 redis_obj.set("userfollowingobjectlistbyuserid#{fan_id_param.to_s}", cached_following_list.to_json)
+                                response = {
+                                    "status" => "Successfully unfollowed the user"
+                                }
+                                end_time = Time.now.to_i
+                                logger.info("Route: /updatefollowings Time: " + (end_time-start_time).to_s) 
+                                response.to_json
 
                             else
+                                end_time = Time.now.to_i
+                                logger.info("Route: /updatefollowings Time: " + (end_time-start_time).to_s) 
                                 400
                             end
-
-
                         else
 
                             ## handling the case when the user wants to follow the follower 
@@ -182,17 +193,6 @@ module Sinatra
                             ## TODO
 
                         end
-                        
-                        start = Time.now.to_i
-                        following = Following.find_by(id: params[:fanfollowing])
-                        if(following.fan_active == true)
-                            following.update(fan_active: false) 
-                        else
-                            following.update(fan_active: true) 
-                        end
-                        end_time = Time.now.to_i
-                        logger.info("Route: /updatefollowers/:fanfollowing Time: " + (end_time-start))
-                        redirect '/followers'
                     end
                 
                     app.get '/insertfollowing' do

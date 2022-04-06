@@ -12,9 +12,11 @@
     <% @feed.each do |tweet| %>
        <div class="tweet-wrapper">
             <div class="tweet" id=<%= tweet["id"].to_s %>>
-                <p><span class="fw-bold"><%= tweet["user_id"].to_s %></span><a href="/user/test">@Placeholder</a></p>
+                <p><span class="fw-bold"><%= tweet["display_name"].to_s %></span><a href="/user/test">@<%= tweet["user_name"] %></a></p>
                 <p><%= tweet["text"].to_s %></p>
-                <button class="reply" id="reply-button-<%= tweet["id"].to_s %>"><i class="bi bi-chat"></i> Placeholder tweet length</button>        
+                <button class="hme-reply" clientId="<%= tweet["user_id"].to_s %>" id="<%= tweet["id"].to_s %>"><i class="bi bi-chat"></i> <%= tweet["tweet_replies_length"] %></button> 
+                <button class="hme-like" clientId="<%= tweet["user_id"].to_s %>"  id="<%= tweet["id"].to_s %>"><i class="bi bi-heart"></i> <%= tweet["tweet_likes_length"] %></button>  
+                <button class="hme-retweet" clientId="<%= tweet["user_id"].to_s %>" id="<%= tweet["id"].to_s %>"><i class="bi bi-arrow-repeat"></i> <%= tweet["tweet_retweets_length"] %></button>        
             </div>
        </div>
         
