@@ -69,17 +69,45 @@ module Sinatra
                         @logger.info "Time elapsed for retweeting tweet: #{ending_rt_time-start_rt_time}".red
                     end
     
-                    app.post '/reply/:tweet' do
+                    app.post '/reply/:tweet_id/:user_id/:text_content' do
 
                         authenticate!
+
+                        start_reply_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
                         redis_obj = settings.redis_instance
                         logger_obj = settings.logger_instance
 
-                        start_reply_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        cur_user = session[:user]
-                        tweet = Tweet.find(params[:tweet])
-                        tweet.tweets.create(user_id:cur_user.id,text:params[:reply])
+                        tweet_id_param = params[:tweet_id]
+                        user_id_param = params[:user_id]
+                        text_content_param = params[:text_content]
+
+                        tweet_active_record = Tweet.find(tweet_id_param.to_i)
+
+                        new_tweet_obj = tweet.tweets.create(user_id: user_id_param.to_i ,text: text_content_param.to_s) 
+
+                        if (new_tweet_obj)
+                            
+                            # Update the feed cache to reflect 
+
+                            if (redis_obj.get("userid#{user_id_param.to_s}tweetid#{tweet_id_param.to_s}retweetslist") == nil)
+
+                                retweets = Tweet.where(user_id: user_id_param.to_i, tweet_id: tweet_id_param.to_i).last(20)
+
+
+
+
+                            else
+
+
+                            end
+
+                            
+
+                        else
+                            404
+                        end
+
                         ending_reply_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
                         @logger.info "Time elapsed for replying to tweet: #{ending_reply_time-start_reply_time}".red
 

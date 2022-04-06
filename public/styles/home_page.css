@@ -114,6 +114,10 @@ html {
     margin-top: 1rem;
     outline-style: none;
     border-style: none;
+    padding: 1rem;
+    border-radius: 0.2rem;
+    resize: none;
+
 }
 
 .hme-horizontal-vertical {
@@ -133,4 +137,8 @@ html {
 
 .hme-reply-prompt-header {
     margin-bottom: 4rem;
+}
+
+.hme-replylist-container {
+    display: none;
 }

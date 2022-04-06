@@ -148,7 +148,8 @@ class SimpleApp < Sinatra::Base
                         "tweet_id" => tweet.tweet_id,
                         "tweet_likes_length" => tweet.likes.length,
                         "tweet_retweets_length" =>  tweet.retweets.length,
-                        "tweet_replies_length" => tweet.tweets.length
+                        "tweet_replies_length" => tweet.tweets.length,
+                        "tweet_replies_array" => []
                     }
 
                     @feed.push(prepared_tweet_obj)

@@ -2,13 +2,60 @@
 const allReplyButtons = document.getElementsByClassName("hme-reply");
 const allLikeButtons = document.getElementsByClassName("hme-like");
 const allRetweetButtons = document.getElementsByClassName("hme-retweet");
+const allReplySubmitButtons = document.getElementsByClassName('hme-reply-submit-button');
+
+
+Array.from(allReplySubmitButtons).forEach((button) => {
+
+
+    button.addEventListener('click', (e) => {
+
+        e.preventDefault();
+
+        console.log("Looks like we are pressing the reply submit button!");
+
+        const localTextAreaElem = e.target.parentNode.querySelector('.hme-reply-input-container');
+
+        const replyTweetContent = localTextAreaElem.value;
+
+        console.log("This is the text area content");
+        
+        console.log(replyTweetContent);
+
+        const options = {
+            method: 'POST'
+        };
+
+        fetch('http://localhost:4567/')
+
+
+
+    });
+
+});
 
 Array.from(allReplyButtons).forEach((replyButtonElem) => {
 
     replyButtonElem.addEventListener('click', (e) => {
 
         e.preventDefault();
+
+        // There will be an asynchronous call here to fetch all the
+        // the cached retweet objects for that specific tweet id
+
         console.log("looks like you clicked the reply button!");
+
+        const replyListContainer = e.target.parentNode.querySelector('.hme-replylist-container');
+
+        if (replyListContainer.style.display === 'block') {
+
+            replyListContainer.style.display = 'none';
+
+        } else {
+
+            replyListContainer.style.display = 'block';
+        }
+
 
 
     });
