@@ -28,6 +28,8 @@ Array.from(unfollowButtons).forEach((buttonElem) => {
             console.log("User was unfollowed");
             console.log(res);
             window.location.href = `/following?uid=${clientUserId}`;
+
+            
         })
         .catch((err) => {
             console.log("There was an issue unfollowing the user");
