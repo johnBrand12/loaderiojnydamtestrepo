@@ -19,7 +19,7 @@ module Sinatra
                         erb(:explore)
                     end
                 
-                    app.get '/searchphrase' do
+                    app.post '/search' do
 
                         @logger = Logger.new($stdout)
 
@@ -72,7 +72,7 @@ module Sinatra
                         end
                         end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
                         @logger.info "User #{@user_id} searched for tweets in #{end_time - start_time} time units"
-                        erb(:exploreresults)
+                        @tweets.to_json
                     end
     
                     app.get '/people' do
