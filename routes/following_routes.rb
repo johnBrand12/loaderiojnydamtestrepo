@@ -290,7 +290,7 @@ module Sinatra
 
                                 prepared_follower_obj = {
                                     
-                                    "fan_id" => follower.obj.fan.id,
+                                    "fan_id" => follower_obj.fan.id,
                                     "fan_username" => follower_obj.fan.username,
                                     "fan_displayname" => follower_obj.fan.display_name,
     

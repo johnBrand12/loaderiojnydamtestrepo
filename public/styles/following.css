@@ -27,6 +27,7 @@ html {
     justify-content: space-between;
     margin-bottom: 1rem;
     padding: 0.5rem;
+    box-shadow: 0px 0px 3px black;
 }
 
 .fllwing-button-column {
@@ -34,6 +35,18 @@ html {
     flex-direction: column;
     justify-content: center;
     margin-right: 0.1rem;
+}
+
+.fllwing-unfollow-button {
+    outline-style: none;
+    border-style: none;
+    background-color: white;
+    padding: 0.2rem;
+    border-radius: 0.2rem;
+}
+
+.fllwing-unfollow-button:hover {
+    color: #1e9bf0;
 }
 
 .fllwing-detail-text-column {
@@ -58,6 +71,7 @@ html {
     color: white;
     background-color: #1e9bf0;
     justify-content: space-between;
+    box-shadow: 0px 0px 3px black;
 }
 
 .fllwer-detail-text-column {
