@@ -68,16 +68,52 @@ Array.from(allReplyButtons).forEach((replyButtonElem) => {
 
 
         let parentTweetId = e.target.attributes[3].value;
+        let sessionUserId = e.target.attributes[1].value;
 
-        console.log(parentTweetId);
+        let hasPressed = e.target.attributes[4].value;
 
-        let cachedRetweets = await fetch(`http://localhost:4567/cachedretweets/${parentTweetId}`);
+        console.log("the has pressed value is");
 
-        console.log("The cached retweets list");
+        console.log(hasPressed);
 
-        console.log(cachedRetweets);
+        if (hasPressed === 'false') {
 
-        console.log("looks like you clicked the reply button!");
+            console.log("The initial if false check was certainly triggered");
+
+            console.log(e.target.attributes);
+
+            console.log(parentTweetId);
+            console.log(sessionUserId);
+    
+            let cachedRetweets = await fetch(`http://localhost:4567/cachedretweets/${parentTweetId}/${sessionUserId}`);
+    
+            cachedRetweets = await cachedRetweets.json();
+    
+            console.log("The cached retweets list");
+    
+            console.log(cachedRetweets);
+
+            const replyContainerReference = e.target.parentNode.querySelector('.hme-reply-component-container')
+    
+            let listHtmlStringResult = "";
+
+            cachedRetweets.forEach((cachedTweet) => {
+    
+                
+                let localString = "";
+                localString += `<div class="hme-reply-component">
+                <span class="hme-reply-component-headertext">${cachedTweet.user_username}@${cachedTweet.user_display_name}</span>
+                <span>${cachedTweet.text}</span>
+                </div>
+                `;
+
+                listHtmlStringResult += localString;
+            });
+
+            replyContainerReference.innerHTML = listHtmlStringResult;
+
+            e.target.attributes[4].value = 'true';
+        }
 
         const replyListContainer = e.target.parentNode.querySelector('.hme-replylist-container');
 

@@ -69,13 +69,49 @@ module Sinatra
                         @logger.info "Time elapsed for retweeting tweet: #{ending_rt_time-start_rt_time}".red
                     end
 
-                    app.get '/cachedretweets/:parent_tweet_id' do
+                    app.get '/cachedretweets/:parent_tweet_id/:user_id' do
+
+                        authenticate!
+
+                        redis_obj = settings.redis_instance
+                        logger_obj = settings.logger_instance
+
+                        parent_tweet_id_param = params[:parent_tweet_id]
+                        user_id_param = params[:user_id]
+
+                        if (redis_obj.get("userid#{user_id_param.to_s}tweetid#{parent_tweet_id_param.to_s}retweetslist") == nil)
+
+                            retweets = Tweet.where(user_id: user_id_param.to_i, tweet_id: parent_tweet_id_param.to_i).last(20)
+                            
+                            prepared_retweet_list = []
+
+                            retweets.each do |retweet_obj|
+
+                                prepared_retweet_obj = {
+                                    "id" => retweet_obj.id,
+                                    "text" => retweet_obj.text,
+                                    "user_id" => retweet_obj.user_id,
+                                    "user_display_name" => retweet_obj.user.display_name,
+                                    "user_username" => retweet_obj.user.username,
+                                    "parent_tweet_id" => retweet_obj.tweet_id,
+                                    "created_at" => retweet_obj.created_at.to_s,
+                                    "updated_at" => retweet_obj.updated_at.to_s
+                                }
+
+                                prepared_retweet_list.push(prepared_retweet_obj)
 
 
+                            end
+                            
+                            redis_obj.set("userid#{user_id_param.to_s}tweetid#{parent_tweet_id_param.to_s}retweetslist", prepared_retweet_list.to_json)
+                            puts "Checkpoint"
+                            prepared_retweet_list.to_json
 
-
-
-
+                        else
+                            puts "Checkpoint"
+                            cached_retweets_list = redis_obj.get("userid#{user_id_param.to_s}tweetid#{parent_tweet_id_param.to_s}retweetslist")
+                            cached_retweets_list
+                        end
                     end
     
                     app.post '/reply/:tweet_id/:user_id/:text_content' do
@@ -111,6 +147,8 @@ module Sinatra
                                         "id" => retweet_obj.id,
                                         "text" => retweet_obj.text,
                                         "user_id" => retweet_obj.user_id,
+                                        "user_display_name" => retweet_obj.user.display_name,
+                                        "user_username" => retweet_obj.user.username,
                                         "parent_tweet_id" => retweet_obj.tweet_id,
                                         "created_at" => retweet_obj.created_at.to_s,
                                         "updated_at" => retweet_obj.updated_at.to_s
@@ -132,6 +170,8 @@ module Sinatra
                                     "id" => new_tweet_obj.id,
                                     "text" => new_tweet_obj.text,
                                     "user_id" => new_tweet_obj.user_id,
+                                    "user_display_name" => new_tweet_obj.user.display_name,
+                                    "user_username" => new_tweet_obj.user.username,
                                     "parent_tweet_id" => new_tweet_obj.tweet_id,
                                     "created_at" => new_tweet_obj.created_at.to_s,
                                     "updated_at" => new_tweet_obj.updated_at.to_s
