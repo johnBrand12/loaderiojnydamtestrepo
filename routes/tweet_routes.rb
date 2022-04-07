@@ -68,6 +68,15 @@ module Sinatra
                         ending_rt_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
                         @logger.info "Time elapsed for retweeting tweet: #{ending_rt_time-start_rt_time}".red
                     end
+
+                    app.get '/cachedretweets/:parent_tweet_id' do
+
+
+
+
+
+
+                    end
     
                     app.post '/reply/:tweet_id/:user_id/:text_content' do
 
@@ -84,7 +93,7 @@ module Sinatra
 
                         tweet_active_record = Tweet.find(tweet_id_param.to_i)
 
-                        new_tweet_obj = tweet.tweets.create(user_id: user_id_param.to_i ,text: text_content_param.to_s) 
+                        new_tweet_obj = tweet_active_record.tweets.create(user_id: user_id_param.to_i ,text: text_content_param.to_s) 
 
                         if (new_tweet_obj)
                             
@@ -94,25 +103,56 @@ module Sinatra
 
                                 retweets = Tweet.where(user_id: user_id_param.to_i, tweet_id: tweet_id_param.to_i).last(20)
 
+                                prepared_retweet_list = []
+
+                                retweets.each do |retweet_obj|
+
+                                    prepared_retweet_obj = {
+                                        "id" => retweet_obj.id,
+                                        "text" => retweet_obj.text,
+                                        "user_id" => retweet_obj.user_id,
+                                        "parent_tweet_id" => retweet_obj.tweet_id,
+                                        "created_at" => retweet_obj.created_at.to_s,
+                                        "updated_at" => retweet_obj.updated_at.to_s
+                                    }
+
+                                    prepared_retweet_list.push(prepared_retweet_obj)
 
 
+                                end
 
+                                redis_obj.set("userid#{user_id_param.to_s}tweetid#{tweet_id_param.to_s}retweetslist", prepared_retweet_list.to_json)
+
+                                puts "Checkpoint"
                             else
 
+                                cached_retweets_list = JSON.parse(redis_obj.get("userid#{user_id_param.to_s}tweetid#{tweet_id_param.to_s}retweetslist"))
+                                new_prepared_retweet = {
 
+                                    "id" => new_tweet_obj.id,
+                                    "text" => new_tweet_obj.text,
+                                    "user_id" => new_tweet_obj.user_id,
+                                    "parent_tweet_id" => new_tweet_obj.tweet_id,
+                                    "created_at" => new_tweet_obj.created_at.to_s,
+                                    "updated_at" => new_tweet_obj.updated_at.to_s
+                                }
+
+                                cached_retweets_list.push(new_prepared_retweet)
+
+                                redis_obj.set("userid#{user_id_param.to_s}tweetid#{tweet_id_param.to_s}retweetslist", cached_retweets_list.to_json)
                             end
-
-                            
-
+                            response = {
+                                "status" => "Successfully added the new retweet"
+                            }
+                            ending_reply_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+                            logger_obj.info "Time elapsed for replying to tweet: #{ending_reply_time-start_reply_time}".red
+                            response.to_json
                         else
+                            ending_reply_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+                            logger_obj.info "Time elapsed for replying to tweet: #{ending_reply_time-start_reply_time}".red
                             404
                         end
-
-                        ending_reply_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        @logger.info "Time elapsed for replying to tweet: #{ending_reply_time-start_reply_time}".red
-
                     end
-
                 end
             end
         end

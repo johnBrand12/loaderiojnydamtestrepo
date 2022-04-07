@@ -12,22 +12,45 @@ Array.from(allReplySubmitButtons).forEach((button) => {
 
         e.preventDefault();
 
-        console.log("Looks like we are pressing the reply submit button!");
-
         const localTextAreaElem = e.target.parentNode.querySelector('.hme-reply-input-container');
 
-        const replyTweetContent = localTextAreaElem.value;
+        const tweetId = e.target.parentNode.parentNode.parentNode.querySelector('.hme-reply').attributes[3].value;
+        const clientUserId = e.target.parentNode.parentNode.parentNode.querySelector('.hme-reply').attributes[2].value;
+        const sessionUserId = e.target.parentNode.parentNode.parentNode.querySelector('.hme-reply').attributes[1].value;
 
-        console.log("This is the text area content");
-        
-        console.log(replyTweetContent);
+        const replyTweetContent = localTextAreaElem.value;
 
         const options = {
             method: 'POST'
         };
 
-        fetch('http://localhost:4567/')
+        fetch(`http://localhost:4567/reply/${tweetId}/${sessionUserId}/${replyTweetContent}`, options)
+        .then((res) => res.json())
+        .then((res) => {
 
+            console.log("The retweet was posted successfully");
+
+            console.log(res);
+
+            const retweetListContainer = e.target.parentNode.parentNode.querySelector('.hme-reply-component-container');
+            console.log(retweetListContainer.attributes);
+
+            const sessionUsername = retweetListContainer.attributes[0].value;
+            const sessionDisplayName = retweetListContainer.attributes[1].value;
+
+            retweetListContainer.innerHTML += `<div class="hme-reply-component">
+                <span class="hme-reply-component-headertext">${sessionUsername}@${sessionDisplayName}</span>
+                <span>${replyTweetContent}</span>
+            </div>`;
+
+        })
+        .catch((err) => {
+
+            console.log("Something went wrong with adding the retweet");
+
+            console.log(err);
+
+        });
 
 
     });
@@ -36,12 +59,23 @@ Array.from(allReplySubmitButtons).forEach((button) => {
 
 Array.from(allReplyButtons).forEach((replyButtonElem) => {
 
-    replyButtonElem.addEventListener('click', (e) => {
+    replyButtonElem.addEventListener('click', async (e) => {
 
         e.preventDefault();
 
         // There will be an asynchronous call here to fetch all the
         // the cached retweet objects for that specific tweet id
+
+
+        let parentTweetId = e.target.attributes[3].value;
+
+        console.log(parentTweetId);
+
+        let cachedRetweets = await fetch(`http://localhost:4567/cachedretweets/${parentTweetId}`);
+
+        console.log("The cached retweets list");
+
+        console.log(cachedRetweets);
 
         console.log("looks like you clicked the reply button!");
 

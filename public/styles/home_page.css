@@ -142,3 +142,22 @@ html {
 .hme-replylist-container {
     display: none;
 }
+
+.hme-reply-component-container {
+    background-color: #f3f3f3;
+}
+
+.hme-reply-component {
+    background-color: white;
+    height: 6rem;
+    border-radius: 0.5rem;
+    box-shadow: 0px 0px 1px black;
+    padding: 0.3rem;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+}
+
+.hme-reply-component-headertext {
+    color: darkgrey;
+}

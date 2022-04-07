@@ -14,9 +14,9 @@
             <div class="tweet" id=<%= tweet["id"].to_s %>>
                 <p><span class="fw-bold"><%= tweet["display_name"].to_s %></span><a href="/user/test">@<%= tweet["user_name"] %></a></p>
                 <p><%= tweet["text"].to_s %></p>
-                <button class="hme-reply hme-tweet-action-button" clientId="<%= tweet["user_id"].to_s %>" id="<%= tweet["id"].to_s %>"><i style="pointer-events:none"class="bi bi-chat"></i> <%= tweet["tweet_replies_length"] %></button> 
-                <button class="hme-like hme-tweet-action-button" clientId="<%= tweet["user_id"].to_s %>"  id="<%= tweet["id"].to_s %>"><i style="pointer-events:none" class="bi bi-heart"></i> <%= tweet["tweet_likes_length"] %></button>  
-                <button class="hme-retweet hme-tweet-action-button" clientId="<%= tweet["user_id"].to_s %>" id="<%= tweet["id"].to_s %>"><i style="pointer-events:none" class="bi bi-arrow-repeat"></i> <%= tweet["tweet_retweets_length"] %></button> 
+                <button class="hme-reply hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>" clientId="<%= tweet["user_id"].to_s %>" id="<%= tweet["id"].to_s %>"><i style="pointer-events:none"class="bi bi-chat"></i> <%= tweet["tweet_replies_length"] %></button> 
+                <button class="hme-like hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= tweet["user_id"].to_s %>"  id="<%= tweet["id"].to_s %>"><i style="pointer-events:none" class="bi bi-heart"></i> <%= tweet["tweet_likes_length"] %></button>  
+                <button class="hme-retweet hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= tweet["user_id"].to_s %>" id="<%= tweet["id"].to_s %>"><i style="pointer-events:none" class="bi bi-arrow-repeat"></i> <%= tweet["tweet_retweets_length"] %></button> 
                 <div class="hme-replylist-container">  
                     <div class="hme-vertical-header">
                         <span class="hme-reply-prompt-header">Please leave a reply here</span>
@@ -24,8 +24,11 @@
                         <button class="hme-reply-submit-button">Submit</button>
                     </div>
                     <hr>
-                    <%# <div class="hme-reply-component-container">
-                    </div> %>
+                    <div 
+                    sessionusername="<%= session[:user]["username"] %>"
+                    sessiondisplayname="<%= session[:user]["display_name"] %>" 
+                    class="hme-reply-component-container">
+                    </div>
                 </div>       
             </div>
        </div>
