@@ -9,30 +9,53 @@
                 <%= flash[type]%>
             </div>
         <% end%>
-    <% @feed.each do |tweet| %>
-       <div class="tweet-wrapper">
-            <div class="tweet" id=<%= tweet["id"].to_s %>>
-                <p><span class="fw-bold"><%= tweet["display_name"].to_s %></span><a href="/user/test">@<%= tweet["user_name"] %></a></p>
-                <p><%= tweet["text"].to_s %></p>
-                <button class="hme-reply hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>" clientId="<%= tweet["user_id"].to_s %>" id="<%= tweet["id"].to_s %>" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i> <%= tweet["tweet_replies_length"] %></button> 
-                <button class="hme-like hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= tweet["user_id"].to_s %>"  id="<%= tweet["id"].to_s %>"><i style="pointer-events:none" class="bi bi-heart"></i> <%= tweet["tweet_likes_length"] %></button>  
-                <button class="hme-retweet hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= tweet["user_id"].to_s %>" id="<%= tweet["id"].to_s %>"><i style="pointer-events:none" class="bi bi-arrow-repeat"></i> <%= tweet["tweet_retweets_length"] %></button> 
-                <div class="hme-replylist-container">  
-                    <div class="hme-vertical-header">
-                        <span class="hme-reply-prompt-header">Please leave a reply here</span>
-                        <textarea class="hme-reply-input-container" placeholder="Leave something here"></textarea>
-                        <button class="hme-reply-submit-button">Submit</button>
+            <div class="hme-tweet-left-vertical-component">
+                <% (@feed.count / 2).times do |index| %>
+                    <div class="tweet" id=<%= @feed[index * 2]["id"].to_s %>>
+                        <p><span class="fw-bold"><%= @feed[index * 2]["display_name"].to_s %></span><a href="/user/test">@<%= @feed[index * 2]["user_name"] %></a></p>
+                        <p><%= @feed[index * 2]["text"].to_s %></p>
+                        <button class="hme-reply hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>" clientId="<%= @feed[index * 2]["user_id"].to_s %>" id="<%= @feed[index * 2]["id"].to_s %>" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i> <%= @feed[index * 2]["tweet_replies_length"] %></button> 
+                        <button class="hme-like hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[index * 2]["user_id"].to_s %>"  id="<%= @feed[index * 2]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-heart"></i> <%= @feed[index * 2]["tweet_likes_length"] %></button>  
+                        <button class="hme-retweet hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[index * 2]["user_id"].to_s %>" id="<%= @feed[index * 2]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-arrow-repeat"></i> <%= @feed[index * 2]["tweet_retweets_length"] %></button> 
+                        <div class="hme-replylist-container">  
+                            <div class="hme-vertical-header">
+                                <span class="hme-reply-prompt-header">Please leave a reply here</span>
+                                <textarea class="hme-reply-input-container" placeholder="Leave something here"></textarea>
+                                <button class="hme-reply-submit-button">Submit</button>
+                            </div>
+                            <hr>
+                            <div 
+                            sessionusername="<%= session[:user]["username"] %>"
+                            sessiondisplayname="<%= session[:user]["display_name"] %>" 
+                            class="hme-reply-component-container">
+                            </div>
+                        </div>       
                     </div>
-                    <hr>
-                    <div 
-                    sessionusername="<%= session[:user]["username"] %>"
-                    sessiondisplayname="<%= session[:user]["display_name"] %>" 
-                    class="hme-reply-component-container">
-                    </div>
-                </div>       
+                <% end %>
             </div>
-       </div>
-        
-    <%end%>
+            <div class="hme-tweet-right-vertical-component">
+                <% (@feed.count / 2).times do |index| %>
+                    <div class="tweet" id=<%= @feed[(index * 2) + 1]["id"].to_s %>>
+                        <p><span class="fw-bold"><%= @feed[(index * 2) + 1]["display_name"].to_s %></span><a href="/user/test">@<%= @feed[(index * 2) + 1]["user_name"] %></a></p>
+                        <p><%= @feed[(index * 2) + 1]["text"].to_s %></p>
+                        <button class="hme-reply hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>" clientId="<%= @feed[(index * 2) + 1]["user_id"].to_s %>" id="<%= @feed[(index * 2) + 1]["id"].to_s %>" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i> <%= @feed[(index * 2) + 1]["tweet_replies_length"] %></button> 
+                        <button class="hme-like hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[(index * 2) + 1]["user_id"].to_s %>"  id="<%= @feed[(index * 2) + 1]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-heart"></i> <%= @feed[(index * 2) + 1]["tweet_likes_length"] %></button>  
+                        <button class="hme-retweet hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[(index * 2) + 1]["user_id"].to_s %>" id="<%= @feed[(index * 2) + 1]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-arrow-repeat"></i> <%= @feed[(index * 2) + 1]["tweet_retweets_length"] %></button> 
+                        <div class="hme-replylist-container">  
+                            <div class="hme-vertical-header">
+                                <span class="hme-reply-prompt-header">Please leave a reply here</span>
+                                <textarea class="hme-reply-input-container" placeholder="Leave something here"></textarea>
+                                <button class="hme-reply-submit-button">Submit</button>
+                            </div>
+                            <hr>
+                            <div 
+                            sessionusername="<%= session[:user]["username"] %>"
+                            sessiondisplayname="<%= session[:user]["display_name"] %>" 
+                            class="hme-reply-component-container">
+                            </div>
+                        </div>       
+                    </div>
+                <% end %>
+            </div>
 </div>
 
