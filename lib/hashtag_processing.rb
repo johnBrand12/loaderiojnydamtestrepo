@@ -4,9 +4,9 @@ module Sinatra
           puts "This is a test to see if hashtags work"
           puts "The raw tweet is #{raw_tweet}"
 
-          raw_tweet_array = raw_tweet.split
+          # raw_tweet_array = raw_tweet.split
 
-          rgex = Regexp.new '/#[a-z]+/'
+          # rgex = Regexp.new '/#[a-z]+/'
 
           new_array = raw_tweet.scan(/#[a-z]+/)
 
