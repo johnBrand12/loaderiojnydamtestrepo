@@ -11,7 +11,7 @@
             <a href="/following?uid=<%= @user["id"] %>"><%= @userfanfollowingcount%> Followings </a>
         </div>
         <% if @user == session[:user]%>
-            <button class="btn btn-warning">edit profile</button>
+            <button class="btn btn-warning prf-edit-profile-button">edit profile</button>
         <%else%>
             <button class="btn btn-outline-primary">follow</button>
         <%end%>

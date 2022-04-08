@@ -6,18 +6,124 @@ module Sinatra
                 def self.registered(app)
 
                     app.post '/create-tweet' do
+                        
+                        tweet_content_param = params[:tweet]
+
+                        array_of_hashtag_instances = process_hashtags(tweet_content_param)
+
+                        if (array_of_hashtag_instances.count != 0)
+
+                            if (redis_obj.get("userid#{session[:user]["id"]}hashtaglist") == nil)
+
+                                list_of_hashtags = []
+
+                                array_of_hashtag_instances.each do |hashtag_string|
+
+                                    raw_text = hashtag_string[1, hashtag_string.length]
+
+                                    puts "Checkpoint"
+                                    new_hastag_obj = Hashtag.create(text: raw_text.to_s)
+
+                                    if (new_hashtag_obj)
+                                        list_of_hashtags.push(hashtag_string)
+                                    else
+                                        400
+                                    end
+                                end 
+
+                                redis_obj.set("userid#{session[:user]["id"]}hashtaglist", list_of_hashtags.to_json)
+
+                            else
+                                cached_user_hashtag_list = JSON.parse(redis_obj.get("userid#{session[:user]["id"]}hashtaglist"))
+
+                                array_of_hashtag_instances.each do |hashtag_string|
+
+                                    cached_user_hashtag_list.push(hashtag_string)
+                                end
+
+                                redis_obj.set("userid#{session[:user]["id"]}hashtaglist", cached_user_hashtag_list.to_json)
+                            end
+                        end
+
+                        puts "checkpoint"
+
+                        start_ct_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
                         authenticate!
 
                         redis_obj = settings.redis_instance
                         logger_obj = settings.logger_instance
 
-                        start_ct_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        cur_user = session[:user]
-                        Tweet.create(user_id:cur_user.id,text:params[:tweet])
-                        ending_ct_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        @logger.info "Time elapsed for creating tweet: #{ending_ct_time-start_ct_time}".red
-                        redirect "/home"
+
+                        if (redis_obj.get("usertweetlistbyid#{session[:user]["id"]}") == nil)
+
+                            user_tweet_list_active_record = Tweet.find(user_id: session[:user]["id"])
+
+                            prepared_tweet_list = []
+
+                            user_tweet_list_active_record.each do |tweet|
+
+                                tweet_likes_length = tweet.likes.length
+                                tweet_retweets_length = tweet.retweets.length
+
+
+                                tweet_obj = {
+                                    "id" => tweet.id,
+                                    "text" => tweet.text,
+                                    "user_id" => tweet.user_id,
+                                    "tweet_id" => tweet.tweet_id,
+                                    "created_at" => tweet.created_at,
+                                    "updated_at" => tweet.updated_at,
+                                    "tweet_likes_length" => tweet_likes_length.to_s,
+                                    "tweet_retweets_length" => tweet_retweets_length.to_s
+                                }
+
+                                prepared_tweet_list.push(tweet_obj)
+
+                            end
+
+                            redis_obj.set("usertweetlistbyid#{session[:user]["id"]}", prepared_tweet_list.to_json)
+                            usertweets = prepared_tweet_list
+
+                        else
+
+                            cached_user_tweets = redis_obj.get("usertweetlistbyid#{session[:user]["id"]}")
+                            usertweets = JSON.parse(cached_user_tweets)
+
+                        end
+
+                        # logic to create the new tweet and add it to the cache 
+
+                        new_created_tweet = Tweet.create(user_id: session[:user]["id"], text:params[:tweet])
+
+                        puts "checkpoint"
+
+                        if (new_created_tweet)
+
+                            tweet_likes_length = new_created_tweet.likes.length
+                            tweet_retweets_length = new_created_tweet.retweets.length
+
+                            prepared_tweet_obj = {
+                                "id" => new_created_tweet.id,
+                                "text" => new_created_tweet.text,
+                                "user_id" => new_created_tweet.user_id,
+                                "tweet_id" => new_created_tweet.tweet_id,
+                                "created_at" => new_created_tweet.created_at,
+                                "updated_at" => new_created_tweet.updated_at,
+                                "tweet_likes_length" => tweet_likes_length.to_s,
+                                "tweet_retweets_length" => tweet_retweets_length.to_s
+                            }
+
+                            usertweets.push(prepared_tweet_obj)
+                            redis_obj.set("usertweetlistbyid#{session[:user]["id"]}", usertweets.to_json)
+                            ending_ct_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+                            logger_obj.info "Time elapsed for creating tweet: #{ending_ct_time-start_ct_time}".red
+                            redirect "/home"
+                        else
+                            ending_ct_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+                            logger_obj.info "Time elapsed for creating tweet: #{ending_ct_time-start_ct_time}".red
+                            400
+                        end
                     end
     
                     app.post '/like-tweet/:tweet_id/:user_id' do

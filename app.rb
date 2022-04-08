@@ -11,6 +11,8 @@ require 'json'
 
 require_relative './lib/authentication'
 require_relative './lib/tweet_actions'
+require_relative './lib/hashtag_processing'
+require_relative './lib/mention_processing'
 
 require_relative "./models/user.rb"
 require_relative "./models/hashtag.rb"
@@ -45,6 +47,9 @@ class SimpleApp < Sinatra::Base
     register Sinatra::SampleApp::Routing::Test
 
     helpers Sinatra::Authentication
+    helpers Sinatra::HashTagProcessing
+    helpers Sinatra::MentionProcessing
+
     helpers TweetActions
 
     set :public_folder, 'public'

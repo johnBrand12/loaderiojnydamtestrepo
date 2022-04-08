@@ -56,32 +56,6 @@ inSignLoginButton.addEventListener('click', () => {
     window.location.href = "/innersigninpost?username=" + document.getElementsByClassName("insign-textinput")[0].value + "&password=" + document.getElementsByClassName("insign-textinput")[1].value;
 });
 
-// const exploreSearchButton = document.querySelector('.expl-search-button');
-// const exploreSearchInput = document.querySelector('.expl-second-row-searchinput');
-
-// exploreSearchButton.addEventListener('click', () => {
-
-//     console.log("Looks like you clicked the search button!");
-
-//     console.log("This is the value");
-//     console.log(exploreSearchInput.value);
-
-//     console.log("Hopefully this will work!");
-
-//     // fetch(`http://localhost:4567/search?phrase=${exploreSearchInput.value}`)
-//     // .then((res) => {
-
-//     //     console.log("successful stuff")
-//     //     console.log(res.status);
-//     // })
-//     // .catch((err) => {
-//     //     console.log("Something went wrong");
-//     //     console.log(err);
-//     // })
-// });
-
-
-
 
 
 

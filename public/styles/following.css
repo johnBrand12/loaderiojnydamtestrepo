@@ -22,8 +22,9 @@ html {
     border-radius: 0.2rem;
     display: flex;
     width: 60%;
-    color: white;
-    background-color: #1e9bf0;
+    color: black;
+    background-color: white;
+    margin: 0.2rem;
     justify-content: space-between;
     margin-bottom: 1rem;
     padding: 0.5rem;
@@ -40,7 +41,8 @@ html {
 .fllwing-unfollow-button {
     outline-style: none;
     border-style: none;
-    background-color: white;
+    background-color: #1e9bf0;
+    color: white;
     padding: 0.2rem;
     border-radius: 0.2rem;
 }
