@@ -35,23 +35,32 @@ class User < ActiveRecord::Base
 
       if (redis_parameter.get("userbyusername#{params[:username].to_s}") == nil)
 
-        raw_user_obj = User.find_by(username:params[:username])
+        raw_user_obj = nil
 
-        prepared_user_obj = {
-          "id" => raw_user_obj.id,
-          "username" => raw_user_obj.username,
-          "display_name" => raw_user_obj.display_name,
-          "email" => raw_user_obj.email,
-          "password" => raw_user_obj.password,
-          "active" => raw_user_obj.active
-        }
+        resultarray = User.where(username: params[:username])
 
-        string = "another checkpoint"
+        puts "checkpoint"
 
-        redis_parameter.set("userbyusername#{params[:username].to_s}", prepared_user_obj.to_json)
+        if (User.where(username: params[:username]).count == 0)
+          return nil
+        else
+          raw_user_obj = User.find_by(username:params[:username])
+       
+          prepared_user_obj = {
+            "id" => raw_user_obj.id,
+            "username" => raw_user_obj.username,
+            "display_name" => raw_user_obj.display_name,
+            "email" => raw_user_obj.email,
+            "password" => raw_user_obj.password,
+            "active" => raw_user_obj.active
+          }
 
-        user_obj = prepared_user_obj
+          string = "another checkpoint"
 
+          redis_parameter.set("userbyusername#{params[:username].to_s}", prepared_user_obj.to_json)
+
+          user_obj = prepared_user_obj
+        end
       else
 
         cached_user_obj = redis_parameter.get("userbyusername#{params[:username].to_s}")

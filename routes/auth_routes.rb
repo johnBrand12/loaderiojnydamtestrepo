@@ -19,7 +19,7 @@ module Sinatra
                     end
                 
                     app.get '/innersigninpost' do 
-                        @logger = Logger.new($stdout)
+                        logger_obj = settings.logger_instance
 
                         puts "These are the params"
                         redis_obj = settings.redis_instance 
@@ -32,7 +32,7 @@ module Sinatra
                             puts user
                             session[:user] = user #user.authenticate does not return the full user from the database
                             end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                            @logger.info "User #{session[:user]["id"]} was authenticated in #{end_time - start_time} units"
+                            logger_obj.info "User #{session[:user]["id"]} was authenticated in #{end_time - start_time} units"
                             redirect_to_original_request
                         else
                             flash[:danger] = "Sign in failed. Incorrect username or password"
@@ -43,21 +43,37 @@ module Sinatra
     
     
                     app.get '/register' do 
-                        @logger = Logger.new($stdout)
+                        logger_obj = settings.logger_instance
                         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        erb :signup, :layout => false
                         end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        @logger.info "The register page was loaded in #{end_time - start_time} time units"
+                        logger_obj.info "The register page was loaded in #{(end_time - start_time).to_s} time units"
+                        erb :signup, :layout => false
                     end
                     
                     app.post '/signup' do 
-                        @logger = Logger.new($stdout)
+
+                        logger_obj = settings.logger_instance
+                        redis_obj = settings.redis_instance 
+    
                         start = Time.now.to_i
                         newUser = User.new({username: params[:username],display_name: params[:display_name],email: params[:email],password: params[:password],active: true})
                         if(newUser.valid? and (params[:password] == params[:pw_confirm]))
+
                             my_password = BCrypt::Password.create(params[:password])
-                            User.create({username: params[:username],display_name: params[:display_name],email: params[:email],password: my_password,active: true})
-                            session[:user] = newUser
+
+                            newly_created_user = User.create({username: params[:username], display_name: params[:display_name], email: params[:email],password: my_password, active: true})
+
+                            prepared_user_obj = {
+                                "id" => newly_created_user.id,
+                                "username" => newly_created_user.username,
+                                "display_name" => newly_created_user.display_name,
+                                "email" => newly_created_user.email,
+                                "password" => newly_created_user.password,
+                                "active" => newly_created_user.active
+                            }
+
+                            session[:user] = prepared_user_obj
+
                             redirect "/user/#{params[:username]}"
                         else 
                             if((params[:password] != params[:pw_confirm]))
@@ -66,7 +82,7 @@ module Sinatra
                                 flash[:notice] = newUser.errors.full_messages.join("\r\n")
                             end
                         end_time = Time.now.to_i
-                        @logger.info("Route: /signup Time: " + (end_time-start))
+                        logger_obj.info("Route: /signup Time: " + (end_time-start).to_s)
                             redirect '/register'
                         end
                     
@@ -75,7 +91,7 @@ module Sinatra
                 
                     app.get '/user/:name' do #protected
 
-                        @logger = Logger.new($stdout)
+                        logger_obj = settings.logger_instance
 
                         redis_obj = settings.redis_instance 
 
@@ -100,6 +116,7 @@ module Sinatra
                                 "username" => user_active_record.username,
                                 "display_name" => user_active_record.display_name,
                                 "email" => user_active_record.email,
+                                "password" => user_active_record.password,
                                 "active" => user_active_record.active
                             }
 
@@ -193,7 +210,7 @@ module Sinatra
                         string = "breakpoint"
 
                         end_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-                        @logger.info "Route: /user/:name  Time: #{end_time-start}"
+                        logger_obj.info "Route: /user/:name  Time: #{(end_time-start).to_s}"
                         erb(:profile)
 
     
