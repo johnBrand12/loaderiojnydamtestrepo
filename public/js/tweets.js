@@ -143,8 +143,8 @@ Array.from(allLikeButtons).forEach((likeButtonElem) => {
 
         const selectedTarget = e.target;
 
-        const tweetId = e.target.attributes[2].value;
-        const clientId = e.target.attributes[1].value;
+        const tweetId = e.target.attributes[3].value;
+        const clientId = e.target.attributes[2].value;
     
         const options = {
             method: 'POST'

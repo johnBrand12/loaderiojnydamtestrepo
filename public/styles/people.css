@@ -79,11 +79,13 @@
     display: flex;
     flex-direction: row;
     border-radius: 0.5rem;
-    background-color: #96d2fa;
+    background-color: white;
     width: '90%';
     height: 4rem;
+    margin-left: 0.4rem;
     margin-bottom: 0.5rem;
     box-shadow: 0px 0px 3px black;
+
 }
 
 .ppl-twitterlogo {

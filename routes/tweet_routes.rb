@@ -6,6 +6,12 @@ module Sinatra
                 def self.registered(app)
 
                     app.post '/create-tweet' do
+
+                        authenticate!
+                        start_ct_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+                        redis_obj = settings.redis_instance
+                        logger_obj = settings.logger_instance
                         
                         tweet_content_param = params[:tweet]
 
@@ -22,7 +28,7 @@ module Sinatra
                                     raw_text = hashtag_string[1, hashtag_string.length]
 
                                     puts "Checkpoint"
-                                    new_hastag_obj = Hashtag.create(text: raw_text.to_s)
+                                    new_hashtag_obj = Hashtag.create(text: raw_text.to_s)
 
                                     if (new_hashtag_obj)
                                         list_of_hashtags.push(hashtag_string)
@@ -38,7 +44,15 @@ module Sinatra
 
                                 array_of_hashtag_instances.each do |hashtag_string|
 
-                                    cached_user_hashtag_list.push(hashtag_string)
+                                    raw_text = hashtag_string[1, hashtag_string.length]
+
+                                    new_hashtag_obj = Hashtag.create(text: raw_text.to_s)
+                                    if (new_hashtag_obj)
+                                        
+                                        cached_user_hashtag_list.push(hashtag_string)
+                                    else
+                                        400
+                                    end
                                 end
 
                                 redis_obj.set("userid#{session[:user]["id"]}hashtaglist", cached_user_hashtag_list.to_json)
@@ -47,17 +61,9 @@ module Sinatra
 
                         puts "checkpoint"
 
-                        start_ct_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-
-                        authenticate!
-
-                        redis_obj = settings.redis_instance
-                        logger_obj = settings.logger_instance
-
-
                         if (redis_obj.get("usertweetlistbyid#{session[:user]["id"]}") == nil)
 
-                            user_tweet_list_active_record = Tweet.find(user_id: session[:user]["id"])
+                            user_tweet_list_active_record = Tweet.where(user_id: session[:user]["id"])
 
                             prepared_tweet_list = []
 
