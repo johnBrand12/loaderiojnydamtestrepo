@@ -63,10 +63,6 @@ Array.from(allReplyButtons).forEach((replyButtonElem) => {
 
         e.preventDefault();
 
-        // There will be an asynchronous call here to fetch all the
-        // the cached retweet objects for that specific tweet id
-
-
         let parentTweetId = e.target.attributes[3].value;
         let sessionUserId = e.target.attributes[1].value;
 
@@ -93,7 +89,7 @@ Array.from(allReplyButtons).forEach((replyButtonElem) => {
     
             console.log(cachedRetweets);
 
-            const replyContainerReference = e.target.parentNode.querySelector('.hme-reply-component-container')
+            const replyContainerReference = e.target.parentNode.parentNode.querySelector('.hme-reply-component-container')
     
             let listHtmlStringResult = "";
 
@@ -115,15 +111,18 @@ Array.from(allReplyButtons).forEach((replyButtonElem) => {
             e.target.attributes[4].value = 'true';
         }
 
-        const replyListContainer = e.target.parentNode.querySelector('.hme-replylist-container');
+        const replyListContainer = e.target.parentNode.parentNode.querySelector('.hme-replylist-container');
+        const outerTweetContainer = e.target.parentNode.parentNode;
 
-        if (replyListContainer.style.display === 'block') {
+        if (outerTweetContainer.className == 'tweetexpanded') {
 
-            replyListContainer.style.display = 'none';
+            outerTweetContainer.className = 'tweet';
+            // replyListContainer.style.display = 'none';
 
         } else {
 
             replyListContainer.style.display = 'block';
+            outerTweetContainer.className = "tweetexpanded";
         }
 
 

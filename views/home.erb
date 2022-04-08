@@ -13,10 +13,12 @@
                 <% (@feed.count / 2).times do |index| %>
                     <div class="tweet" id=<%= @feed[index * 2]["id"].to_s %>>
                         <p><span class="fw-bold"><%= @feed[index * 2]["display_name"].to_s %></span><a href="/user/test">@<%= @feed[index * 2]["user_name"] %></a></p>
-                        <p><%= @feed[index * 2]["text"].to_s %></p>
-                        <button class="hme-reply hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>" clientId="<%= @feed[index * 2]["user_id"].to_s %>" id="<%= @feed[index * 2]["id"].to_s %>" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i> <%= @feed[index * 2]["tweet_replies_length"] %></button> 
-                        <button class="hme-like hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[index * 2]["user_id"].to_s %>"  id="<%= @feed[index * 2]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-heart"></i> <%= @feed[index * 2]["tweet_likes_length"] %></button>  
-                        <button class="hme-retweet hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[index * 2]["user_id"].to_s %>" id="<%= @feed[index * 2]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-arrow-repeat"></i> <%= @feed[index * 2]["tweet_retweets_length"] %></button> 
+                        <p class="hme-text-container"><%= @feed[index * 2]["text"].to_s %></p>
+                        <div class="hme-button-container">
+                            <button class="hme-reply hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>" clientId="<%= @feed[index * 2]["user_id"].to_s %>" id="<%= @feed[index * 2]["id"].to_s %>" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i> <%= @feed[index * 2]["tweet_replies_length"] %></button> 
+                            <button class="hme-like hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[index * 2]["user_id"].to_s %>"  id="<%= @feed[index * 2]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-heart"></i> <%= @feed[index * 2]["tweet_likes_length"] %></button>  
+                            <button class="hme-retweet hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[index * 2]["user_id"].to_s %>" id="<%= @feed[index * 2]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-arrow-repeat"></i> <%= @feed[index * 2]["tweet_retweets_length"] %></button> 
+                        </div>
                         <div class="hme-replylist-container">  
                             <div class="hme-vertical-header">
                                 <span class="hme-reply-prompt-header">Please leave a reply here</span>
@@ -37,10 +39,12 @@
                 <% (@feed.count / 2).times do |index| %>
                     <div class="tweet" id=<%= @feed[(index * 2) + 1]["id"].to_s %>>
                         <p><span class="fw-bold"><%= @feed[(index * 2) + 1]["display_name"].to_s %></span><a href="/user/test">@<%= @feed[(index * 2) + 1]["user_name"] %></a></p>
-                        <p><%= @feed[(index * 2) + 1]["text"].to_s %></p>
-                        <button class="hme-reply hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>" clientId="<%= @feed[(index * 2) + 1]["user_id"].to_s %>" id="<%= @feed[(index * 2) + 1]["id"].to_s %>" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i> <%= @feed[(index * 2) + 1]["tweet_replies_length"] %></button> 
-                        <button class="hme-like hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[(index * 2) + 1]["user_id"].to_s %>"  id="<%= @feed[(index * 2) + 1]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-heart"></i> <%= @feed[(index * 2) + 1]["tweet_likes_length"] %></button>  
-                        <button class="hme-retweet hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[(index * 2) + 1]["user_id"].to_s %>" id="<%= @feed[(index * 2) + 1]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-arrow-repeat"></i> <%= @feed[(index * 2) + 1]["tweet_retweets_length"] %></button> 
+                        <p class="hme-text-container"><%= @feed[(index * 2) + 1]["text"].to_s %></p>
+                        <div class="hme-button-container">
+                            <button class="hme-reply hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>" clientId="<%= @feed[(index * 2) + 1]["user_id"].to_s %>" id="<%= @feed[(index * 2) + 1]["id"].to_s %>" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i> <%= @feed[(index * 2) + 1]["tweet_replies_length"] %></button> 
+                            <button class="hme-like hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[(index * 2) + 1]["user_id"].to_s %>"  id="<%= @feed[(index * 2) + 1]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-heart"></i> <%= @feed[(index * 2) + 1]["tweet_likes_length"] %></button>  
+                            <button class="hme-retweet hme-tweet-action-button" userid="<%= session[:user]["id"].to_s %>"  clientId="<%= @feed[(index * 2) + 1]["user_id"].to_s %>" id="<%= @feed[(index * 2) + 1]["id"].to_s %>"><i style="pointer-events:none" class="bi bi-arrow-repeat"></i> <%= @feed[(index * 2) + 1]["tweet_retweets_length"] %></button> 
+                        </div>
                         <div class="hme-replylist-container">  
                             <div class="hme-vertical-header">
                                 <span class="hme-reply-prompt-header">Please leave a reply here</span>

@@ -15,45 +15,6 @@ module Sinatra
                         
                         tweet_content_param = params[:tweet]
 
-                        ## handling mention instances 
-
-                        array_of_mention_instances = process_mentions(tweet_content_param)
-
-                        if (array_of_mentions == nil) 
-                            return 400
-                        else
-
-                            if (array_of_mentions.count != 0)
-
-                                if (redis_obj.get("userid#{session[:user]["id"]}mentionlist") == nil)
-
-                                    list_of_mentions = []
-
-
-                                else
-
-                                    cached_user_mention_list = JSON.parse(redis_obj.get("userid#{session[:user]["id"]}mentionlist"))
-
-                                    ## Currently does not support mention uniqueness in the cache, we can refactor later
-
-                                    array_of_mention_instances.each do |hashtag_string|
-
-                                        raw_text = hashtag_string[1, hashtag_string.length]
-    
-                                        new_hashtag_obj = Mention.create(text: raw_text.to_s)
-                                        if (new_hashtag_obj)
-                                            
-                                            cached_user_hashtag_list.push(hashtag_string)
-                                        else
-                                            400
-                                        end
-                                    end
-    
-                                    redis_obj.set("userid#{session[:user]["id"]}hashtaglist", cached_user_hashtag_list.to_json)
-
-                                end
-                            end
-                        end
                         
 
 
@@ -151,6 +112,44 @@ module Sinatra
                         puts "checkpoint"
 
                         if (new_created_tweet)
+
+                            ## handling mention instances 
+                            array_of_mention_instances = process_mentions(tweet_content_param)
+
+                            if (array_of_mentions == nil) 
+                                return 400
+                            else
+
+                                if (array_of_mentions.count != 0)
+
+                                    if (redis_obj.get("userid#{session[:user]["id"]}mentionlist") == nil)
+
+                                        list_of_mentions = []
+                                        
+                                    else
+
+                                        cached_user_mention_list = JSON.parse(redis_obj.get("userid#{session[:user]["id"]}mentionlist"))
+
+                                        ## Currently does not support mention uniqueness in the cache, we can refactor later
+
+                                        array_of_mention_instances.each do |hashtag_string|
+
+                                            raw_text = hashtag_string[1, hashtag_string.length]
+        
+                                            new_hashtag_obj = Mention.create(text: raw_text.to_s)
+                                            if (new_hashtag_obj)
+                                                
+                                                cached_user_hashtag_list.push(hashtag_string)
+                                            else
+                                                400
+                                            end
+                                        end
+        
+                                        redis_obj.set("userid#{session[:user]["id"]}hashtaglist", cached_user_hashtag_list.to_json)
+
+                                    end
+                                end
+                            end
 
                             tweet_likes_length = new_created_tweet.likes.length
                             tweet_retweets_length = new_created_tweet.retweets.length
