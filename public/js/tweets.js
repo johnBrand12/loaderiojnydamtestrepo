@@ -22,7 +22,9 @@ nextPaginationButton.addEventListener('click', () => {
 
     let queriedPageNum = pageNum + 1; 
 
-    fetch(`http://localhost:4567/feedpageservice/${userId}/${pageNum}`)
+    console.log(queriedPageNum);
+
+    fetch(`http://localhost:4567/feedpageservice/${userId}/${queriedPageNum}`)
     .then((res) => res.json())
     .then((res) => {
 

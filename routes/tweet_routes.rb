@@ -91,7 +91,7 @@ module Sinatra
                             ending_index = 0
                             starting_index = (page_num_param - 1) * 50
 
-                            if ((page_num_param - 1) * 50) >= cached_feed_ten_pages.size
+                            if (((page_num_param - 1) * 50) + 49) >= cached_feed_ten_pages.size
                                 ending_index = cached_feed_ten_pages.size - 1
                             else
                                 ending_index = ((page_num_param - 1) * 50) + 49
@@ -99,7 +99,7 @@ module Sinatra
 
                             puts "new checkpoint here"
 
-                            paginated_feed = cached_feed_ten_pages[(starting_index)...((ending_index)]
+                            paginated_feed = cached_feed_ten_pages[(starting_index)...(ending_index)]
                             paginated_feed.to_json
                         end  
                     end
