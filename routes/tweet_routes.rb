@@ -5,6 +5,105 @@ module Sinatra
                 require 'colorize'
                 def self.registered(app)
 
+
+                    app.get '/feedpageservice/:user_id/:pagenum' do
+
+                        redis_obj = settings.redis_instance
+                        logger_obj = settings.logger_instance
+
+                        user_id_param = params[:user_id].to_i
+
+                        page_num_param = params[:pagenum].to_i
+
+                        followings = []
+
+                        if (!settings.redis_instance.get("user#{session[:user]["id"].to_s}followinglist"))
+
+                            @cur_user = User.find(session[:user]["id"].to_i);
+                            @feed = []
+                
+                            if (@cur_user.fan_followings != nil)
+                                @cur_user.fan_followings.each do |following|
+                                    puts "This is the following"
+                                    puts following.to_json
+                                    followings.push(following.star.id)
+                                end
+                            end
+                
+                            settings.redis_instance.set("user#{session[:user]["id"].to_s}followinglist", followings.to_json)
+                
+                        else
+                            cached_following_list = settings.redis_instance.get("user#{session[:user]["id"].to_s}followinglist")
+                            followings = JSON.parse(cached_following_list)
+                        end
+
+                        puts "This is the current following representation"
+
+                        puts followings
+
+                        cached_feed_ten_pages = []
+
+                        if (redis_obj.get("user#{session[:user]["id"].to_s}feedtweetstenpages") == nil)
+
+                            @tweets = Tweet.all # create user feed
+                            @feed = []
+                            @tweets.each_with_index do |tweet, index|
+
+                                puts "The index is #{index}"
+
+                                puts "The tweet is #{tweet}"
+                                if (followings.include? tweet.user_id) && (cached_feed_ten_pages.size < 500)
+                
+                                    modified_tweet_text = handle_mention_hashtag_parsing(tweet.text)
+                
+                                    puts "modified tweet checkpoint"
+                
+                                    prepared_tweet_obj = {
+                                        "id" => tweet.id,
+                                        "text" => modified_tweet_text,
+                                        "user_id" => tweet.user_id,
+                                        "display_name" => tweet.user.display_name,
+                                        "user_name" => tweet.user.username,
+                                        "tweet_id" => tweet.tweet_id,
+                                        "tweet_likes_length" => tweet.likes.length,
+                                        "tweet_retweets_length" =>  tweet.retweets.length,
+                                        "tweet_replies_length" => tweet.tweets.length,
+                                        "tweet_replies_array" => []
+                                    }
+                
+                                    if @feed.size < 51
+                                        @feed.push(prepared_tweet_obj)
+                                    end
+                
+                                    cached_feed_ten_pages.push(prepared_tweet_obj)
+                                end
+                            end
+                            redis_obj.set("user#{session[:user]["id"].to_s}feedtweetstenpages", cached_feed_ten_pages.to_json)
+
+                            puts "new cache checkpoint"
+
+                            cached_feed_ten_pages.to_json 
+                        else
+                            cached_feed_ten_pages = JSON.parse(redis_obj.get("user#{session[:user]["id"].to_s}feedtweetstenpages"))
+
+                            puts "intemediary checkpoint"
+
+                            ending_index = 0
+                            starting_index = (page_num_param - 1) * 50
+
+                            if ((page_num_param - 1) * 50) >= cached_feed_ten_pages.size
+                                ending_index = cached_feed_ten_pages.size - 1
+                            else
+                                ending_index = ((page_num_param - 1) * 50) + 49
+                            end
+
+                            puts "new checkpoint here"
+
+                            paginated_feed = cached_feed_ten_pages[(starting_index)...((ending_index)]
+                            paginated_feed.to_json
+                        end  
+                    end
+
                     app.post '/create-tweet' do
 
                         authenticate!

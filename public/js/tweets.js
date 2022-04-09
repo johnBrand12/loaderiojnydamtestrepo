@@ -4,6 +4,57 @@ const allLikeButtons = document.getElementsByClassName("hme-like");
 const allRetweetButtons = document.getElementsByClassName("hme-retweet");
 const allReplySubmitButtons = document.getElementsByClassName('hme-reply-submit-button');
 
+const nextPaginationButton = document.querySelector('.hme-next-button');
+const pageNumSpanElement= document.querySelector('.hme-heading-pagenum');
+const prevPaginationButton = document.querySelector('.hme-prev-button');
+
+nextPaginationButton.addEventListener('click', () => {
+
+    console.log("Looks you clicked on the next pagination button!");
+
+    const pageNum = parseInt(pageNumSpanElement.textContent);
+    const userId = parseInt(pageNumSpanElement.attributes[0].value);
+
+    console.log("The page number is: ");
+
+    console.log(pageNum);
+    console.log(userId);
+
+    let queriedPageNum = pageNum + 1; 
+
+    fetch(`http://localhost:4567/feedpageservice/${userId}/${pageNum}`)
+    .then((res) => res.json())
+    .then((res) => {
+
+        console.log("The next pagination request was successful!");
+        console.log(res);
+    })
+    .catch((err) => {
+
+        console.log("The next pagination request was not successful");
+        console.log(err);
+
+    });
+
+
+});
+
+prevPaginationButton.addEventListener('click', () => {
+
+    console.log("Looks like you clicked on the previous pagination button")
+
+    fetch('http://localhost:4567/feedpageservice/:user_id/:pagenum')
+    .then((res) => {
+
+
+    })
+    .catch((err) => {
+
+    });
+
+
+});
+
 
 Array.from(allReplySubmitButtons).forEach((button) => {
 
@@ -199,40 +250,6 @@ Array.from(allRetweetButtons).forEach((retweetButtonElem) => {
 
     });
 });
-
-
-
-// $(document).ready(function(){
-//     $(".reply-thread").hide()
-
-//     //reply tweets
-//     $(".reply").click(function(){
-//         var reply_id = $(this).attr('id').split('-')[2]
-//         $('#reply-thread-'+reply_id).toggle()
-//     })
-    
-//     //like tweets
-//     $(".like").click(function(){
-//         var tweet_id = $(this).attr('id').split('-')[2]
-//         console.log($(this).attr('id'))
-//         $.post(`/like-tweet/${tweet_id}`,function(data,status){
-            
-//             location.reload();
-//             return false;
-//         })
-//     })
-
-//     //retweet tweets 
-//     $(".retweet").click(function(){
-//         var retweet_id = $(this).attr('id').split('-')[2]
-//         console.log($(this).attr('id'))
-//         console.log("retweeted"+$(this).attr('id').split('-')[2])
-//         $.post(`/retweet/${retweet_id}`,function(data,status){   
-//             location.reload();
-//             return false;
-//         })
-//     })
-// })
 
 
 

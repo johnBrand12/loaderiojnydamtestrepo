@@ -139,12 +139,15 @@ class SimpleApp < Sinatra::Base
 
         if (!settings.redis_instance.get("user#{session[:user]["id"].to_s}feedtweets"))
 
-            @tweets = Tweet.all # create user feed
-            @tweets.each do |tweet|
-                if followings.include? tweet.user_id
-                    if @feed.size == 50
-                        break
-                    end
+            cached_feed_ten_pages = []
+
+            # an optimization could be created here to only with all the tweets of the people 
+            # that they follow, not the entire database
+
+            @tweets = Tweet.all 
+            @tweets.each_with_index do |tweet, index|
+
+                if (followings.include? tweet.user_id) && (cached_feed_ten_pages.size < 500)
 
                     modified_tweet_text = handle_mention_hashtag_parsing(tweet.text)
 
@@ -163,11 +166,18 @@ class SimpleApp < Sinatra::Base
                         "tweet_replies_array" => []
                     }
 
-                    @feed.push(prepared_tweet_obj)
+                    if @feed.size < 51
+                        @feed.push(prepared_tweet_obj)
+                    end
+
+                    cached_feed_ten_pages.push(prepared_tweet_obj)
                 end
             end
 
+            puts "This is the cached ten pages checkpoint"
+
             settings.redis_instance.set("user#{session[:user]["id"].to_s}feedtweets", @feed.to_json)
+            settings.redis_instance.set("user#{session[:user]["id"].to_s}feedtweetstenpages", cached_feed_ten_pages.to_json)
 
         else
             cached_tweets = settings.redis_instance.get("user#{session[:user]["id"].to_s}feedtweets")

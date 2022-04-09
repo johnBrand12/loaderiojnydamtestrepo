@@ -10,8 +10,9 @@
             </div>
         <% end%>
             <div class="hme-header-paging-container">
-                <button class="hme-paging-button-style"><i class="bi bi-arrow-left"></i> previous</button>
-                <button class="hme-paging-button-style">next <i class="bi bi-arrow-right"></i> </button>
+                <button class="hme-paging-button-style hme-prev-button"><i class="bi bi-arrow-left"></i> previous</button>
+                <span>page <span userid="<%= session[:user]["id"] %>" class="hme-heading-pagenum">1</span</span>
+                <button class="hme-paging-button-style hme-next-button">next <i class="bi bi-arrow-right"></i> </button>
             </div>
             <div class="hme-main-tweet-content-container">
                <div class="hme-tweet-left-vertical-component">
