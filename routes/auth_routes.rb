@@ -181,10 +181,13 @@ module Sinatra
                                 tweet_likes_length = tweet.likes.length
                                 tweet_retweets_length = tweet.retweets.length
 
+                                modified_tweet_text = handle_mention_hashtag_parsing(tweet.text)
+
+                                puts "modified tweet checkkpoint"
 
                                 tweet_obj = {
                                     "id" => tweet.id,
-                                    "text" => tweet.text,
+                                    "text" => modified_tweet_text,
                                     "user_id" => tweet.user_id,
                                     "tweet_id" => tweet.tweet_id,
                                     "created_at" => tweet.created_at,

@@ -13,6 +13,7 @@ require_relative './lib/authentication'
 require_relative './lib/tweet_actions'
 require_relative './lib/hashtag_processing'
 require_relative './lib/mention_processing'
+require_relative './lib/display_processing'
 
 require_relative "./models/user.rb"
 require_relative "./models/hashtag.rb"
@@ -49,6 +50,7 @@ class SimpleApp < Sinatra::Base
     helpers Sinatra::Authentication
     helpers Sinatra::HashTagProcessing
     helpers Sinatra::MentionProcessing
+    helpers Sinatra::DisplayProcessing
 
     helpers TweetActions
 
@@ -144,9 +146,13 @@ class SimpleApp < Sinatra::Base
                         break
                     end
 
+                    modified_tweet_text = handle_mention_hashtag_parsing(tweet.text)
+
+                    puts "modified tweet checkpoint"
+
                     prepared_tweet_obj = {
                         "id" => tweet.id,
-                        "text" => tweet.text,
+                        "text" => modified_tweet_text,
                         "user_id" => tweet.user_id,
                         "display_name" => tweet.user.display_name,
                         "user_name" => tweet.user.username,

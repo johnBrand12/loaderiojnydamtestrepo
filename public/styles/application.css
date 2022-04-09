@@ -31,3 +31,11 @@ body {
     max-height: 100vh;
     background-image: linear-gradient(to bottom right, #b3e5fc, white);
 }
+
+.purple-text {
+    color: purple
+}
+
+.orange-text {
+    color: orange;
+}

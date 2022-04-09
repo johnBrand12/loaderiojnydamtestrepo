@@ -15,8 +15,6 @@ module Sinatra
                         
                         tweet_content_param = params[:tweet]
 
-                        
-
 
                         ## handling hashtag instances 
 
@@ -116,15 +114,37 @@ module Sinatra
                             ## handling mention instances 
                             array_of_mention_instances = process_mentions(tweet_content_param)
 
-                            if (array_of_mentions == nil) 
+                            if (array_of_mention_instances == nil) 
                                 return 400
                             else
 
-                                if (array_of_mentions.count != 0)
+                                if (array_of_mention_instances.count != 0)
 
                                     if (redis_obj.get("userid#{session[:user]["id"]}mentionlist") == nil)
 
                                         list_of_mentions = []
+
+                                        array_of_mention_instances.each do |mention_string|
+
+                                            ## need to find the corresponding user here
+                                            raw_text = mention_string[1, mention_string.length]
+
+                                            mention_user_obj = User.where(username: raw_text)[0]
+
+                                            new_mention_obj = Mention.create(user_id: mention_user_obj.id, tweet_id: new_created_tweet.id)
+
+                                            if (new_mention_obj)
+
+                                                list_of_mentions.push(mention_string)
+
+                                            else
+                                                400
+                                            end
+                                        end
+
+                                        # save the json list of mentions used to a cache
+
+                                        redis_obj.set("userid#{session[:user]["id"]}mentionlist", list_of_mentions.to_json)
                                         
                                     else
 
@@ -132,20 +152,21 @@ module Sinatra
 
                                         ## Currently does not support mention uniqueness in the cache, we can refactor later
 
-                                        array_of_mention_instances.each do |hashtag_string|
+                                        array_of_mention_instances.each do |mention_string|
 
-                                            raw_text = hashtag_string[1, hashtag_string.length]
+                                            raw_text = mention_string[1, mention_string.length]
         
-                                            new_hashtag_obj = Mention.create(text: raw_text.to_s)
-                                            if (new_hashtag_obj)
+                                            new_mention_obj = Mention.create(text: raw_text.to_s)
+
+                                            if (new_mention_obj)
                                                 
-                                                cached_user_hashtag_list.push(hashtag_string)
+                                                cached_user_mention_list.push(mention_string)
                                             else
                                                 400
                                             end
                                         end
         
-                                        redis_obj.set("userid#{session[:user]["id"]}hashtaglist", cached_user_hashtag_list.to_json)
+                                        redis_obj.set("userid#{session[:user]["id"]}hashtaglist", cached_user_mention_list.to_json)
 
                                     end
                                 end
