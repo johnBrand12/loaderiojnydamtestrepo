@@ -25,6 +25,7 @@ group :production do
     gem "rspec"
     gem "faker"
     gem "redis"
+    gem "colorize", "~> 0.8.1"
     gem "sinatra-contrib"
     gem 'test_helper', '~> 0.0.1'
     gem 'bcrypt'
@@ -41,10 +42,11 @@ group :development do
     gem "rack-test"
     gem "rspec"
     gem "faker"
+    gem "colorize", "~> 0.8.1"
     gem "sinatra-contrib"
     gem 'test_helper', '~> 0.0.1'
     gem 'bcrypt'
     gem 'sinatra-flash'
     gem 'thin'
 end
-gem "colorize", "~> 0.8.1"
+
