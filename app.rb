@@ -219,9 +219,9 @@ class SimpleApp < Sinatra::Base
         erb(:home)
     end
 
-    # after do
-    #     ActiveRecord::Base.clear_active_connections!
-    # end
+    after do
+        ActiveRecord::Base.clear_active_connections!
+    end
 
     
 
