@@ -1,96 +1,294 @@
 ENV['APP_ENV'] = 'test'
-require_relative '../app.rb'
 
+require_relative '../app.rb'
 require 'rack/test'
 require 'test/spec'
-require 'rspec/core'
 
 
-def app
-  Sinatra::Application
-end
+require_relative "../models/tweet.rb"
+require_relative "../models/user.rb"
+require_relative "../models/mention.rb"
+require_relative "../models/following.rb"
+require_relative "../models/like.rb"
+require_relative "../models/retweet.rb"
 
-include Test::Unit::Assertions
-include Rack::Test::Methods
+db_options = {adapter: 'postgresql', database: 'nanotwitter_test'}
+ActiveRecord::Base.establish_connection(db_options)
 
-#This is the following - this is testing for the people that I follow
-#This is testing the list of people that I follow, so the fan_id = 115
-describe "GET on /updatefollowing/:fanfollowing" do
-  before do
+RSpec.describe "Testing the GET /following via the /followingjsontest route and GET /follower via the /followerjsontest route" do
+
+  include Rack::Test::Methods
+
+  def app
+    SimpleApp
+  end
+
+  before(:all) do
+
+    redis_test_obj = Redis.new(url: 'redis://redistogo:1af524c39770f9e227ef0f94a3e6ac94@sole.redistogo.com:10663/')
+    redis_test_obj.flushall
+
+    Retweet.delete_all()
+    Tweet.delete_all()
     Following.delete_all()
-    Following.create(
-      id: 92,
-      star_id: 6,
-      fan_id: 115,
-      fan_active: true)
-    
-    Following.create(
-        id: 135,
-        star_id: 30,
-        fan_id: 115,
-        fan_active: false)
-  end
-  it "should change following from true to false for a user" do
-    #This is testing for a star_id = 6
-    #This just means that the fan_id = 115 and star_id = 6(sample user). Therefore user 115 is following user 6
-    get '/updatefollowing/92' 
-    following = Following.where(fan_id: 115).find_by(star_id: 6)
-    assert_equal(false,following.fan_active)
+    User.delete_all()
+
+    User.create!(
+      id: 1,
+      username: "testfanuserone",
+      display_name: "Test Fan User One",
+      active: true,
+      email: "testfanuserone@gmail.com",
+      password: BCrypt::Password.create("password")
+    )
+
+    User.create!(
+      id: 2,
+      username: "teststaruserone",
+      display_name: "Test Star User One",
+      active: true,
+      email: "teststaruserone@gmail.com",
+      password: BCrypt::Password.create("password")
+    )
+
+    User.create!(
+      id: 3,
+      username: "teststarusertwo",
+      display_name: "Test Star User Two",
+      active: true,
+      email: "teststarusertwo@gmail.com",
+      password: BCrypt::Password.create("password")
+    )
+
+    Following.create!(
+        id: 1,
+        star_id: 2,
+        fan_id: 1
+    )
+
+    Following.create!(
+      id: 2,
+      star_id: 3,
+      fan_id: 1
+    )
+
   end
 
-  #The opposite from above  
-  it "should change following from false to true for a user" do
-    get '/updatefollowing/135'
-    followings = Following.where(fan_id: 115).find_by(star_id: 30)
-    assert_equal(true,followings.fan_active)
+  it 'should return a json representation of the following list with the correct configuration' do
+
+    get '/followingsjsontest?user_id=1'
+    attributes = JSON.parse(last_response.body)
+    expect(attributes[0]["star_id"]).to eq(2)
+    expect(attributes[1]["star_id"]).to eq(3)
+
   end
+
+  it 'should return a json representation of the follower list with the correct configuration' do
+
+    get '/followersjsontest?user_id=3'
+    attributes = JSON.parse(last_response.body)
+    expect(attributes[0]["fan_id"]).to eq(1)
+    
+  end
+
 end
 
-#This is for the list of people who follow this user. Therefore, star_id = 115
-describe "GET on /updatefollowers/:fanfollowing" do
-  before do
 
+
+RSpec.describe "POST on /updatefollowings/:fan_id/:star_id/:action" do
+
+
+  include Rack::Test::Methods
+
+  def app
+    SimpleApp
+  end
+
+
+  before(:all) do
+
+    redis_test_obj = Redis.new(url: 'redis://redistogo:1af524c39770f9e227ef0f94a3e6ac94@sole.redistogo.com:10663/')
+    redis_test_obj.flushall
+
+    Retweet.delete_all()
+    Tweet.delete_all()
     Following.delete_all()
-    Following.create(
-      id: 10001,
-      star_id: 37,
-      fan_id: 115,
-      fan_active: false)
-   
-    Following.create(
-        id: 91,
-        star_id: 47,
-        fan_id: 115,
-        fan_active: true)
+    User.delete_all()
+
+    User.create!(
+      id: 1,
+      username: "testfanuserone",
+      display_name: "Test Fan User One",
+      active: true,
+      email: "testfanuserone@gmail.com",
+      password: BCrypt::Password.create("password")
+    )
+
+    User.create!(
+      id: 2,
+      username: "teststaruserone",
+      display_name: "Test Star User One",
+      active: true,
+      email: "teststaruserone@gmail.com",
+      password: BCrypt::Password.create("password")
+    )
     
-  end
-  it "should change fan_active for this user." do
-    #Calling the route with star_id = 37
-    #When the code executes, the fan_active should be true for 37 signifying that
-    #this user 37 is now a follower of user 115
-    get '/updatefollowers/10001' #calling the route
-    followings = Following.where(fan_id: 115).find_by(star_id: 37)
-    assert_equal(true,followings.fan_active)
+    Following.create!(
+      id: 1,
+      star_id: 2,
+      fan_id: 1
+    )
+
   end
 
-  it "should change fan_active for this user." do
-    #Calling the route with star_id = 47
-    #When the code executes, the fan_active should be false for 37 signifying that
-    #this user 37 is no longer a follower of user 115
-    get '/updatefollowers/91' #calling the route
-    followings = Following.where(fan_id: 115).find_by(star_id: 47)
-    assert_equal(false,followings.fan_active)
+  it 'Should remove the following object from the database' do
+
+    post '/updatefollowings/1/2/unfollow?user_id=1'
+    expect(last_response.status).to eq(200)
+    following_list = Following.all
+    expect(following_list.count).to eq(0)
+
   end
+
+
+
+  ## more tests to handle edge cases
 
 
 end
-#This should add another record to the table where the starid = 26 and the fanid = 115
-describe "GET on /insertfollowing" do
-    it "should add another record to the followings table" do
-      num = Following.where(fan_id: 115).count
-        get '/insertfollowing?starid=20&fanid=115'
-        assert_equal(num+1,Following.where(fan_id: 115).count) #asserting that there are 8 records in the table
-        following1 = Following.where(fan_id: 115).find_by(star_id: 20) #getting this following record
-        assert_equal(true,following1.fan_active) #asserting that the fan_active is true 
-    end
-end 
+
+RSpec.describe "POST on /insertfollowingservice", type: :request do
+
+
+  include Rack::Test::Methods
+
+  def app
+    SimpleApp
+  end
+
+  before(:all) do
+
+    redis_test_obj = Redis.new(url: 'redis://redistogo:1af524c39770f9e227ef0f94a3e6ac94@sole.redistogo.com:10663/')
+    redis_test_obj.flushall
+
+    Retweet.delete_all()
+    Tweet.delete_all()
+    Following.delete_all()
+    User.delete_all()
+
+    User.create!(
+      id: 1,
+      username: "testfanuserone",
+      display_name: "Test Fan User One",
+      active: true,
+      email: "testfanuserone@gmail.com",
+      password: BCrypt::Password.create("password")
+    )
+
+    User.create!(
+      id: 2,
+      username: "teststaruserone",
+      display_name: "Test Star User One",
+      active: true,
+      email: "teststaruserone@gmail.com",
+      password: BCrypt::Password.create("password")
+    )
+  end
+
+  it "should insert a new following object into the database" do
+
+    post '/insertfollowingservice?user_id=1', {
+      star_id: 2
+    }.to_json
+
+    expect(last_response.status).to eq(200)
+    following_obj = Following.where(fan_id: 1)
+    expect(following_obj.length).to eq(1)
+
+  end
+
+
+  # more tests to handle edge cases....
+
+
+end
+
+RSpec.describe "GET on /following/retrievelistcache", type: :request do
+
+  include Rack::Test::Methods
+
+  def app
+    SimpleApp
+  end
+  
+
+  before(:all) do
+
+    redis_test_obj = Redis.new(url: 'redis://redistogo:1af524c39770f9e227ef0f94a3e6ac94@sole.redistogo.com:10663/')
+    redis_test_obj.flushall
+
+    Retweet.delete_all()
+    Tweet.delete_all()
+    Following.delete_all()
+    User.delete_all()
+
+    User.create!(
+      id: 1,
+      username: "testfanuserone",
+      display_name: "Test Fan User One",
+      active: true,
+      email: "testfanuserone@gmail.com",
+      password: BCrypt::Password.create("password")
+    )
+
+    User.create!(
+      id: 2,
+      username: "teststaruserone",
+      display_name: "Test Star User One",
+      active: true,
+      email: "teststaruserone@gmail.com",
+      password: BCrypt::Password.create("password")
+    )
+
+    User.create!(
+      id: 3,
+      username: "teststarusertwo",
+      display_name: "Test Star User Two",
+      active: true,
+      email: "teststarusertwo@gmail.com",
+      password: BCrypt::Password.create("password")
+    )
+
+
+    Following.create!(
+        id: 1,
+        star_id: 2,
+        fan_id: 1
+    )
+
+    Following.create!(
+      id: 2,
+      star_id: 3,
+      fan_id: 1
+    )
+
+  end
+
+  it "should return a list of json which represents that user id 1 has 2 followings" do
+
+    get '/following/retrievelistcache?uid=1&user_id=1'
+    expect(last_response.status).to eq(200)
+    attributes = JSON.parse(last_response.body)
+    expect(attributes.length).to eq(2)
+    expect(attributes[0]["star_id"]).to eq(2)
+    expect(attributes[1]["star_id"]).to eq(3)
+
+  end
+
+  ## more tests to handle edge cases
+
+
+end
+
+
+

@@ -7,29 +7,109 @@ const allReplySubmitButtons = document.getElementsByClassName('hme-reply-submit-
 const nextPaginationButton = document.querySelector('.hme-next-button');
 const pageNumSpanElement= document.querySelector('.hme-heading-pagenum');
 const prevPaginationButton = document.querySelector('.hme-prev-button');
+const leftVerticalTweetList = document.querySelector('.hme-tweet-left-vertical-component');
+const rightVerticalTweetList = document.querySelector('.hme-tweet-right-vertical-component');
 
 nextPaginationButton.addEventListener('click', () => {
 
-    console.log("Looks you clicked on the next pagination button!");
-
     const pageNum = parseInt(pageNumSpanElement.textContent);
     const userId = parseInt(pageNumSpanElement.attributes[0].value);
-
-    console.log("The page number is: ");
-
-    console.log(pageNum);
-    console.log(userId);
+    const sessionUserName = pageNumSpanElement.attributes[1].value;
+    const sessionDisplayName = pageNumSpanElement.attributes[2].value;
 
     let queriedPageNum = pageNum + 1; 
 
-    console.log(queriedPageNum);
-
-    fetch(`http://localhost:4567/feedpageservice/${userId}/${queriedPageNum}`)
+    fetch(`/feedpageservice/${userId}/${queriedPageNum}`)
     .then((res) => res.json())
     .then((res) => {
 
-        console.log("The next pagination request was successful!");
-        console.log(res);
+        // parsing the tweets back into the DOM readable format
+
+        let halfResLength = res.length / 2;
+
+        // first for loop to populate the left container correctly 
+
+        let verticalLeftTweets = [];
+        let verticalRightTweets = [];
+
+        for (let i = 0; i < halfResLength; i++) {
+
+            let localTweetObj = res[i * 2];
+
+            if (localTweetObj !== undefined) {
+
+                let localTweet = `<div class="tweet" id=${localTweetObj.id}>
+                <p><span class="fw-bold">${localTweetObj.display_name}</span><a href="/user/test">@${localTweetObj.user_name}</a></p>
+                <p class="hme-text-container">${localTweetObj.text}</p>
+                <div class="hme-button-container">
+                    <button class="hme-reply hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i>${localTweetObj.tweet_replies_length}</button> 
+                    <button class="hme-like hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" ><i style="pointer-events:none" class="bi bi-heart"></i> ${localTweetObj.tweet_likes_length}</button>  
+                    <button class="hme-retweet hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" ><i style="pointer-events:none" class="bi bi-arrow-repeat"></i>${localTweetObj.tweet_retweets_length}</button> 
+                </div>
+                <div class="hme-replylist-container">  
+                    <div class="hme-vertical-header">
+                        <span class="hme-reply-prompt-header">Please leave a reply here</span>
+                        <textarea class="hme-reply-input-container" placeholder="Leave something here"></textarea>
+                        <button class="hme-reply-submit-button">Submit</button>
+                    </div>
+                    <hr>
+                    <div 
+                    sessionusername="${sessionUserName}"
+                    sessiondisplayname="${sessionDisplayName}" 
+                    class="hme-reply-component-container">
+                    </div>
+                </div>       
+            </div>`;
+
+            verticalLeftTweets += localTweet;
+
+            }
+
+        }
+
+        // second for loop to populat the right container correctly 
+
+        for (let i = 0; i < halfResLength; i++) {
+
+
+            let localTweetObj = res[(i * 2) + 1];
+
+            if (localTweetObj !== undefined) {
+
+
+                let localTweet = `<div class="tweet" id=${localTweetObj.id}>
+                    <p><span class="fw-bold">${localTweetObj.display_name}</span><a href="/user/test">@${localTweetObj.user_name}</a></p>
+                    <p class="hme-text-container">${localTweetObj.text}</p>
+                    <div class="hme-button-container">
+                        <button class="hme-reply hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i>${localTweetObj.tweet_replies_length}</button> 
+                        <button class="hme-like hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" ><i style="pointer-events:none" class="bi bi-heart"></i> ${localTweetObj.tweet_likes_length}</button>  
+                        <button class="hme-retweet hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" ><i style="pointer-events:none" class="bi bi-arrow-repeat"></i>${localTweetObj.tweet_retweets_length}</button> 
+                    </div>
+                    <div class="hme-replylist-container">  
+                        <div class="hme-vertical-header">
+                            <span class="hme-reply-prompt-header">Please leave a reply here</span>
+                            <textarea class="hme-reply-input-container" placeholder="Leave something here"></textarea>
+                            <button class="hme-reply-submit-button">Submit</button>
+                        </div>
+                        <hr>
+                        <div 
+                        sessionusername="${sessionUserName}"
+                        sessiondisplayname="${sessionDisplayName}" 
+                        class="hme-reply-component-container">
+                        </div>
+                    </div>       
+                </div>`;
+
+                verticalRightTweets += localTweet;
+
+            }
+
+        }
+
+
+        leftVerticalTweetList.innerHTML = verticalLeftTweets;
+        rightVerticalTweetList.innerHTML = verticalRightTweets;
+        pageNumSpanElement.textContent = queriedPageNum;
     })
     .catch((err) => {
 
@@ -43,15 +123,109 @@ nextPaginationButton.addEventListener('click', () => {
 
 prevPaginationButton.addEventListener('click', () => {
 
-    console.log("Looks like you clicked on the previous pagination button")
+    const pageNum = parseInt(pageNumSpanElement.textContent);
+    const userId = parseInt(pageNumSpanElement.attributes[0].value);
+    const sessionUserName = pageNumSpanElement.attributes[1].value;
+    const sessionDisplayName = pageNumSpanElement.attributes[2].value;
 
-    fetch('http://localhost:4567/feedpageservice/:user_id/:pagenum')
+    let queriedPageNum = pageNum - 1; 
+
+    fetch(`/feedpageservice/${userId}/${queriedPageNum}`)
+    .then((res) => res.json())
     .then((res) => {
 
+        // parsing the tweets back into the DOM readable format
 
+        let halfResLength = res.length / 2;
+
+        // first for loop to populate the left container correctly 
+
+        let verticalLeftTweets = [];
+        let verticalRightTweets = [];
+
+        for (let i = 0; i < halfResLength; i++) {
+
+            let localTweetObj = res[i * 2];
+
+            if (localTweetObj !== undefined) {
+
+                let localTweet = `<div class="tweet" id=${localTweetObj.id}>
+                <p><span class="fw-bold">${localTweetObj.display_name}</span><a href="/user/test">@${localTweetObj.user_name}</a></p>
+                <p class="hme-text-container">${localTweetObj.text}</p>
+                <div class="hme-button-container">
+                    <button class="hme-reply hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i>${localTweetObj.tweet_replies_length}</button> 
+                    <button class="hme-like hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" ><i style="pointer-events:none" class="bi bi-heart"></i> ${localTweetObj.tweet_likes_length}</button>  
+                    <button class="hme-retweet hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" ><i style="pointer-events:none" class="bi bi-arrow-repeat"></i>${localTweetObj.tweet_retweets_length}</button> 
+                </div>
+                <div class="hme-replylist-container">  
+                    <div class="hme-vertical-header">
+                        <span class="hme-reply-prompt-header">Please leave a reply here</span>
+                        <textarea class="hme-reply-input-container" placeholder="Leave something here"></textarea>
+                        <button class="hme-reply-submit-button">Submit</button>
+                    </div>
+                    <hr>
+                    <div 
+                    sessionusername="${sessionUserName}"
+                    sessiondisplayname="${sessionDisplayName}" 
+                    class="hme-reply-component-container">
+                    </div>
+                </div>       
+            </div>`;
+
+            verticalLeftTweets += localTweet;
+
+            }
+
+        }
+
+        // second for loop to populat the right container correctly 
+
+        for (let i = 0; i < halfResLength; i++) {
+
+
+            let localTweetObj = res[(i * 2) + 1];
+
+            if (localTweetObj !== undefined) {
+
+
+                let localTweet = `<div class="tweet" id=${localTweetObj.id}>
+                    <p><span class="fw-bold">${localTweetObj.display_name}</span><a href="/user/test">@${localTweetObj.user_name}</a></p>
+                    <p class="hme-text-container">${localTweetObj.text}</p>
+                    <div class="hme-button-container">
+                        <button class="hme-reply hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" hasPressed="false"><i style="pointer-events:none"class="bi bi-chat"></i>${localTweetObj.tweet_replies_length}</button> 
+                        <button class="hme-like hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" ><i style="pointer-events:none" class="bi bi-heart"></i> ${localTweetObj.tweet_likes_length}</button>  
+                        <button class="hme-retweet hme-tweet-action-button" userid="${userId}" clientId="${localTweetObj.user_id}" id="${localTweetObj.id}" ><i style="pointer-events:none" class="bi bi-arrow-repeat"></i>${localTweetObj.tweet_retweets_length}</button> 
+                    </div>
+                    <div class="hme-replylist-container">  
+                        <div class="hme-vertical-header">
+                            <span class="hme-reply-prompt-header">Please leave a reply here</span>
+                            <textarea class="hme-reply-input-container" placeholder="Leave something here"></textarea>
+                            <button class="hme-reply-submit-button">Submit</button>
+                        </div>
+                        <hr>
+                        <div 
+                        sessionusername="${sessionUserName}"
+                        sessiondisplayname="${sessionDisplayName}" 
+                        class="hme-reply-component-container">
+                        </div>
+                    </div>       
+                </div>`;
+
+                verticalRightTweets += localTweet;
+
+            }
+
+        }
+
+
+        leftVerticalTweetList.innerHTML = verticalLeftTweets;
+        rightVerticalTweetList.innerHTML = verticalRightTweets;
+        pageNumSpanElement.textContent = queriedPageNum;
     })
     .catch((err) => {
 
+        console.log("The next pagination request was not successful");
+        console.log(err);
     });
 
 
@@ -68,7 +242,6 @@ Array.from(allReplySubmitButtons).forEach((button) => {
         const localTextAreaElem = e.target.parentNode.querySelector('.hme-reply-input-container');
 
         const tweetId = e.target.parentNode.parentNode.parentNode.querySelector('.hme-reply').attributes[3].value;
-        const clientUserId = e.target.parentNode.parentNode.parentNode.querySelector('.hme-reply').attributes[2].value;
         const sessionUserId = e.target.parentNode.parentNode.parentNode.querySelector('.hme-reply').attributes[1].value;
 
         const replyTweetContent = localTextAreaElem.value;
@@ -77,17 +250,11 @@ Array.from(allReplySubmitButtons).forEach((button) => {
             method: 'POST'
         };
 
-        fetch(`http://localhost:4567/reply/${tweetId}/${sessionUserId}/${replyTweetContent}`, options)
+        fetch(`/reply/${tweetId}/${sessionUserId}/${replyTweetContent}`, options)
         .then((res) => res.json())
         .then((res) => {
 
-            console.log("The retweet was posted successfully");
-
-            console.log(res);
-
             const retweetListContainer = e.target.parentNode.parentNode.querySelector('.hme-reply-component-container');
-            console.log(retweetListContainer.attributes);
-
             const sessionUsername = retweetListContainer.attributes[0].value;
             const sessionDisplayName = retweetListContainer.attributes[1].value;
 
@@ -100,7 +267,6 @@ Array.from(allReplySubmitButtons).forEach((button) => {
         .catch((err) => {
 
             console.log("Something went wrong with adding the retweet");
-
             console.log(err);
 
         });
@@ -121,26 +287,11 @@ Array.from(allReplyButtons).forEach((replyButtonElem) => {
 
         let hasPressed = e.target.attributes[4].value;
 
-        console.log("the has pressed value is");
-
-        console.log(hasPressed);
-
         if (hasPressed === 'false') {
-
-            console.log("The initial if false check was certainly triggered");
-
-            console.log(e.target.attributes);
-
-            console.log(parentTweetId);
-            console.log(sessionUserId);
     
-            let cachedRetweets = await fetch(`http://localhost:4567/cachedretweets/${parentTweetId}/${sessionUserId}`);
+            let cachedRetweets = await fetch(`/cachedretweets/${parentTweetId}/${sessionUserId}`);
     
             cachedRetweets = await cachedRetweets.json();
-    
-            console.log("The cached retweets list");
-    
-            console.log(cachedRetweets);
 
             const replyContainerReference = e.target.parentNode.parentNode.querySelector('.hme-reply-component-container')
     
@@ -170,15 +321,12 @@ Array.from(allReplyButtons).forEach((replyButtonElem) => {
         if (outerTweetContainer.className == 'tweetexpanded') {
 
             outerTweetContainer.className = 'tweet';
-            // replyListContainer.style.display = 'none';
 
         } else {
 
             replyListContainer.style.display = 'block';
             outerTweetContainer.className = "tweetexpanded";
         }
-
-
 
     });
 
@@ -193,8 +341,6 @@ Array.from(allLikeButtons).forEach((likeButtonElem) => {
 
         console.dir(e.target);
 
-        const selectedTarget = e.target;
-
         const tweetId = e.target.attributes[3].value;
         const clientId = e.target.attributes[2].value;
     
@@ -202,7 +348,7 @@ Array.from(allLikeButtons).forEach((likeButtonElem) => {
             method: 'POST'
         };
     
-        fetch(`http://localhost:4567/like-tweet/${tweetId}/${clientId}`, options)
+        fetch(`/like-tweet/${tweetId}/${clientId}`, options)
             .then((res) => res.json())
             .then((res) => {
     
@@ -236,12 +382,11 @@ Array.from(allRetweetButtons).forEach((retweetButtonElem) => {
             method: 'POST'
         };
     
-        fetch(`http://localhost:4567/retweet/${tweetId}`, options)
+        fetch(`/retweet/${tweetId}`, options)
         .then((res) => res.json())
         .then((res) => {
     
             console.log("The retweet request was received");
-    
             console.log(res);
     
         })

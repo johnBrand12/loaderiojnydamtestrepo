@@ -6,11 +6,6 @@ module Sinatra
                 def self.registered(app)
 
                     app.get '/search' do     #protected 
-
-
-                        puts "this is the search route"
-
-
                         @logger = Logger.new($stdout)
                         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
                         authenticate!
@@ -80,8 +75,6 @@ module Sinatra
                         erb(:people)
                     end
 
-                    ## NOT A REQUIRED ROUTE FOR PROJECT
-                    # Will modularize into a service that will connect with main app -- json
                     app.get '/search/friends/:username' do
 
                         following_statuses = []

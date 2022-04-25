@@ -20,3 +20,21 @@
 .prf-edit-profile-button {
     margin-bottom: 1rem;
 }
+
+.prf-user-info {
+    margin-top: 0.8rem;
+}
+
+.prf-header-search-container{
+    background-color: white;
+    padding: 0.6rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    width: 11rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.prf-user-followings {
+    margin-bottom: 0.7rem;
+}

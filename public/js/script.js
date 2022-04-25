@@ -9,21 +9,13 @@
 // }
 
 const inputBoxLabel = document.querySelector('.insign-input-label');
-
 const inputBoxLabelContainer = document.querySelector('.insign-input-label');
 const inputBoxLabelText = document.querySelector('.insign-input-label-text');
-
 const insignInput = document.querySelector('.insign-textinput');
-const passwordLabelText = document.querySelector('.insign-passwordlabel');
-
-
+const passwordLabelText = document.querySelector('.insign-passwordlabel')
 const insignGreyCardContainer = document.querySelector('.inner-signin-container');
-
 const inSignXButton = document.querySelector('.insign-xsvgbutton');
-
 const inSignLoginButton = document.querySelector('.insign-nextbutton');
-
-// explore page elements
 
 
 inSignXButton.addEventListener('click', () => {
@@ -48,15 +40,9 @@ insignInput.addEventListener('blur', () => {
 });
 
 insignGreyCardContainer.addEventListener('mouseleave', () => {
-    console.log("We are mouse overing something");
     insignInput.blur();
 });
 
 inSignLoginButton.addEventListener('click', () => {
     window.location.href = "/innersigninpost?username=" + document.getElementsByClassName("insign-textinput")[0].value + "&password=" + document.getElementsByClassName("insign-textinput")[1].value;
 });
-
-
-
-
-

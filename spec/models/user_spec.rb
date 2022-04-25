@@ -1,4 +1,3 @@
-require "spec_helper"
 require "sinatra/activerecord"
 require "active_record"
 

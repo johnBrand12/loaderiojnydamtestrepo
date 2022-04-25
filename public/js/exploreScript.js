@@ -3,28 +3,15 @@ const exploreSearchButton = document.querySelector('.expl-search-button');
 const exploreSearchInput = document.querySelector('.expl-second-row-searchinput');
 const searchResultListContainer = document.querySelector('.expl-search-results-container');
 
-console.log("This is the search button");
-console.log(exploreSearchButton);
-
-console.log("This is the searh results container");
-
-console.log(searchResultListContainer);
-
 exploreSearchButton.addEventListener('click', (e) => {
-
-    console.log(exploreSearchInput.value);
-
 
     const options = {
         method: 'POST'
     };
 
-    fetch(`http://localhost:4567/search?phrase=${exploreSearchInput.value}`, options)
+    fetch(`/search?phrase=${exploreSearchInput.value}`, options)
     .then((res) => res.json())
     .then((res) => {
-
-        console.log("successful stuff")
-        console.log(res);
 
         let searchResultHtmlList = "";
 

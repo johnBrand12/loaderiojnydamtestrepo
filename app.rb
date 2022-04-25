@@ -55,10 +55,11 @@ class SimpleApp < Sinatra::Base
     helpers TweetActions
 
     set :public_folder, 'public'
+    set :port, 4567
 
     
-   
     configure do
+        # We need to put the redis url into an environment variable later
         @redis = Redis.new(url: 'redis://redistogo:1af524c39770f9e227ef0f94a3e6ac94@sole.redistogo.com:10663/')
         @logger = Logger.new(STDOUT)
         set :redis_instance, @redis
@@ -67,17 +68,15 @@ class SimpleApp < Sinatra::Base
 
 
     get '/' do
-        if session[:user]
-            redirect "/home"
+        if (session[:user] || params[:user_id])
+            if (params[:user_id])
+                redirect "/home?user_id=#{params[:user_id].to_s}"
+            else
+                redirect "/home"
+            end
         else
             erb :outersignin, :layout => false
         end
-    end
-
-    get '/master' do
-        authenticate!
-        @tweets = Tweet.all
-        erb(:master) 
     end
 
     get '/home' do 
@@ -190,12 +189,6 @@ class SimpleApp < Sinatra::Base
         @user_name = session[:user]["username"].to_s
 
         erb(:home)
-    end
-
-
-    get '/notifications' do  #protected 
-        authenticate!
-        erb(:notifications)
     end
 
     after do

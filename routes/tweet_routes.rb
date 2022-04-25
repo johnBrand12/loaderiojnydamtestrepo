@@ -24,8 +24,6 @@ module Sinatra
                 
                             if (@cur_user.fan_followings != nil)
                                 @cur_user.fan_followings.each do |following|
-                                    puts "This is the following"
-                                    puts following.to_json
                                     followings.push(following.star.id)
                                 end
                             end
@@ -37,10 +35,6 @@ module Sinatra
                             followings = JSON.parse(cached_following_list)
                         end
 
-                        puts "This is the current following representation"
-
-                        puts followings
-
                         cached_feed_ten_pages = []
 
                         if (redis_obj.get("user#{session[:user]["id"].to_s}feedtweetstenpages") == nil)
@@ -49,14 +43,9 @@ module Sinatra
                             @feed = []
                             @tweets.each_with_index do |tweet, index|
 
-                                puts "The index is #{index}"
-
-                                puts "The tweet is #{tweet}"
                                 if (followings.include? tweet.user_id) && (cached_feed_ten_pages.size < 500)
                 
                                     modified_tweet_text = handle_mention_hashtag_parsing(tweet.text)
-                
-                                    puts "modified tweet checkpoint"
                 
                                     prepared_tweet_obj = {
                                         "id" => tweet.id,
@@ -80,24 +69,18 @@ module Sinatra
                             end
                             redis_obj.set("user#{session[:user]["id"].to_s}feedtweetstenpages", cached_feed_ten_pages.to_json)
 
-                            puts "new cache checkpoint"
-
                             cached_feed_ten_pages.to_json 
                         else
                             cached_feed_ten_pages = JSON.parse(redis_obj.get("user#{session[:user]["id"].to_s}feedtweetstenpages"))
 
-                            puts "intemediary checkpoint"
-
                             ending_index = 0
                             starting_index = (page_num_param - 1) * 50
 
-                            if (((page_num_param - 1) * 50) + 49) >= cached_feed_ten_pages.size
+                            if (((page_num_param - 1) * 50) + 50) >= cached_feed_ten_pages.size
                                 ending_index = cached_feed_ten_pages.size - 1
                             else
-                                ending_index = ((page_num_param - 1) * 50) + 49
+                                ending_index = ((page_num_param - 1) * 50) + 50
                             end
-
-                            puts "new checkpoint here"
 
                             paginated_feed = cached_feed_ten_pages[(starting_index)...(ending_index)]
                             paginated_feed.to_json
@@ -129,7 +112,6 @@ module Sinatra
 
                                     raw_text = hashtag_string[1, hashtag_string.length]
 
-                                    puts "Checkpoint"
                                     new_hashtag_obj = Hashtag.create(text: raw_text.to_s)
 
                                     if (new_hashtag_obj)
@@ -162,8 +144,6 @@ module Sinatra
                                 redis_obj.set("userid#{session[:user]["id"]}hashtaglist", cached_user_hashtag_list.to_json)
                             end
                         end
-
-                        puts "checkpoint"
 
                         if (redis_obj.get("usertweetlistbyid#{session[:user]["id"]}") == nil)
 
@@ -205,8 +185,6 @@ module Sinatra
                         # logic to create the new tweet and add it to the cache 
 
                         new_created_tweet = Tweet.create(user_id: session[:user]["id"], text:params[:tweet])
-
-                        puts "checkpoint"
 
                         if (new_created_tweet)
 
@@ -274,9 +252,11 @@ module Sinatra
                             tweet_likes_length = new_created_tweet.likes.length
                             tweet_retweets_length = new_created_tweet.retweets.length
 
+                            modified_tweet_text = handle_mention_hashtag_parsing(new_created_tweet.text)
+
                             prepared_tweet_obj = {
                                 "id" => new_created_tweet.id,
-                                "text" => new_created_tweet.text,
+                                "text" => modified_tweet_text,
                                 "user_id" => new_created_tweet.user_id,
                                 "tweet_id" => new_created_tweet.tweet_id,
                                 "created_at" => new_created_tweet.created_at,
@@ -381,11 +361,9 @@ module Sinatra
                             end
                             
                             redis_obj.set("userid#{user_id_param.to_s}tweetid#{parent_tweet_id_param.to_s}retweetslist", prepared_retweet_list.to_json)
-                            puts "Checkpoint"
                             prepared_retweet_list.to_json
 
                         else
-                            puts "Checkpoint"
                             cached_retweets_list = redis_obj.get("userid#{user_id_param.to_s}tweetid#{parent_tweet_id_param.to_s}retweetslist")
                             cached_retweets_list
                         end
@@ -438,7 +416,6 @@ module Sinatra
 
                                 redis_obj.set("userid#{user_id_param.to_s}tweetid#{tweet_id_param.to_s}retweetslist", prepared_retweet_list.to_json)
 
-                                puts "Checkpoint"
                             else
 
                                 cached_retweets_list = JSON.parse(redis_obj.get("userid#{user_id_param.to_s}tweetid#{tweet_id_param.to_s}retweetslist"))

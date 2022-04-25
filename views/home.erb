@@ -1,6 +1,7 @@
 <head>
     <title>Nanotwitter | Home</title>
     <link rel="stylesheet" type="text/css" href="/styles/home_page.css">
+     <script src="/js/home.js" defer></script>
 </head>
 
 <div class="content">
@@ -11,7 +12,13 @@
         <% end%>
             <div class="hme-header-paging-container">
                 <button class="hme-paging-button-style hme-prev-button"><i class="bi bi-arrow-left"></i> previous</button>
-                <span>page <span userid="<%= session[:user]["id"] %>" class="hme-heading-pagenum">1</span</span>
+                <span>page <span 
+                    userid="<%= session[:user]["id"] %>"
+                    sessionusername="<%= session[:user]["username"] %>"
+                    sessiondisplayname="<%= session[:user]["display_name"] %>"  class="hme-heading-pagenum">1</span></span>
+                <div class="hme-header-search-container">
+                    <i class="bi bi-search"></i><span class="hme-search-header-text">Search for Tweets</span>
+                </div>
                 <button class="hme-paging-button-style hme-next-button">next <i class="bi bi-arrow-right"></i> </button>
             </div>
             <div class="hme-main-tweet-content-container">

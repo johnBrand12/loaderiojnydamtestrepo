@@ -1,4 +1,3 @@
-require "spec_helper"
 require "sinatra/activerecord"
 require "active_record"
 
@@ -21,7 +20,7 @@ require_relative "../models/retweet.rb"
 RSpec.describe 'Search Functionality Endpoints' do
 
     def app
-        Sinatra::Application
+        SimpleApp
     end
 
     include Test::Unit::Assertions
@@ -120,10 +119,18 @@ RSpec.describe 'Search Functionality Endpoints' do
 
     end
 
-    it "Should report that John (user 51) has 2 followers" do
+    it "Testing internal search functionality -- Should report that John (user 51) has 2 followers" do
 
         test_tweets = Tweet.select{|x| x.text["textwhichwillappeartwice"] != nil}
         assert test_tweets.count == 2
+
+    end
+
+    it "Should report that the POST /search endpoint returns a json result containing the 2 tweets constructed above" do
+
+        post '/search?phrase=textwhichwillappeartwice&user_id=1'
+        attributes = JSON.parse(last_response.body)
+        expect(attributes.length).to eq(2)
 
     end
 

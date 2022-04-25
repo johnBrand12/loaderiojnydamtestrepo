@@ -1,10 +1,9 @@
 {
-    "keys": ["user_id", "phrase"] ,
+    "keys": ["user_id"] ,
     "values": [
-      ["533", "SQL"],
-      ["534", "redundant"],
-      ["535", "firewall"],
-      ["536", "RSS"],
-      ["537", "interface"]
+      ["61"],
+      ["76"],
+      ["83"],
+      ["131"]
     ]
 }

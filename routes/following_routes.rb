@@ -21,7 +21,14 @@ module Sinatra
 
                     app.get '/following/retrievelistcache' do
 
-                        authenticate!
+                        if (params[:user_id] == nil)
+                            authenticate!
+                        else
+                            session[:user] = {
+                                "id" => params[:uid]
+                            }
+                        end
+
                         local_uid = params[:uid]
 
                         redis_obj = settings.redis_instance
@@ -53,20 +60,26 @@ module Sinatra
                         end
                     end
 
-                    app.post '/removefollowingservice' do
+                    # ## THIS HAS ALREADY BEEN implemented with the update folllowing service
+                    # app.post '/removefollowingservice' do
 
-                        # TODO for when the user presses the unfollow button on the people page
+                    #     # TODO for when the user presses the unfollow button on the people page
 
-                    end
+                    # end
 
                     app.post '/insertfollowingservice' do
 
 
-                        authenticate!
+                        if (params[:user_id] == nil)
+                            authenticate!
+                        else
+                            session[:user] = {
+                                "id" => params[:user_id]
+                            }
+                        end
+
                         # This endpoint will assume on the frontend that you can't
                         # follow someone that is already in the database cache, it will be clear
-
-
                         # Remember in these routes to update the fanfollowing cache count number as well
 
                         redis_obj = settings.redis_instance
@@ -136,13 +149,17 @@ module Sinatra
                 
                     app.post '/updatefollowings/:fan_id/:star_id/:action' do
 
-                        authenticate!
-
+                        if (params[:user_id] == nil)
+                            authenticate!
+                        else
+                            session[:user] = {
+                                "id" => params[:user_id]
+                            }
+                        end
 
                         start_time = Time.now.to_i
                         redis_obj = settings.redis_instance
                         logger_obj = settings.logger_instance
-
 
                         fan_id_param = params[:fan_id].to_i
                         star_id_param = params[:star_id].to_i
@@ -152,12 +169,38 @@ module Sinatra
 
                             follow_destory_result = Following.where(star_id: star_id_param, fan_id: fan_id_param)[0].destroy
 
-
                             if (follow_destory_result)
 
-                                # update cache to reflect change
+                                cached_following_list = []
 
-                                cached_following_list = JSON.parse(redis_obj.get("userfollowingobjectlistbyuserid#{fan_id_param.to_s}"))
+                                if (redis_obj.get("userfollowingobjectlistbyuserid#{fan_id_param.to_s}") == nil)
+
+                                    following_list_active_record = User.where(id: fan_id_param)[0].fan_followings
+        
+                                    prepared_following_list = []
+        
+                                    following_list_active_record.each do |following_obj|
+        
+                                        prepared_following_obj = {
+                                            
+                                            "star_id" => following_obj.star.id,
+                                            "star_username" => following_obj.star.username,
+                                            "star_displayname" => following_obj.star.display_name,
+            
+                                        }
+        
+                                        prepared_following_list.push(prepared_following_obj)
+        
+                                    end
+        
+                                    redis_obj.set("userfollowingobjectlistbyuserid#{fan_id_param.to_s}", prepared_following_list.to_json)
+        
+                                    cached_following_list = prepared_following_list
+                                    
+                                else
+        
+                                    cached_following_list = JSON.parse(redis_obj.get("userfollowingobjectlistbyuserid#{fan_id_param.to_s}"))
+                                end
 
                                 local_delete_target = nil
 
@@ -186,12 +229,6 @@ module Sinatra
                                 logger.info("Route: /updatefollowings Time: " + (end_time-start_time).to_s) 
                                 400
                             end
-                        else
-
-                            ## handling the case when the user wants to follow the follower 
-
-                            ## TODO
-
                         end
                     end
                 
@@ -262,7 +299,7 @@ module Sinatra
                         
                     end
     
-                    app.get '/followers' do  #protected 
+                    app.get '/followers' do
 
                         user_id = params[:user_id]
                         uid = params[:uid]
@@ -318,21 +355,83 @@ module Sinatra
                         erb(:followers)
                     end
 
+
+                    app.get '/followingsjsontest' do
+
+                        input_user_id = params[:user_id]
+
+                        redis_obj = settings.redis_instance 
+                        logger_obj = settings.logger_instance 
+
+                        if (redis_obj.get("userfollowingobjectlistbyuserid#{input_user_id.to_s}") == nil)
+
+                            following_list_active_record = User.where(id: input_user_id)[0].fan_followings
+
+                            prepared_following_list = []
+
+                            following_list_active_record.each do |following_obj|
+
+                                prepared_following_obj = {
+                                    
+                                    "star_id" => following_obj.star.id,
+                                    "star_username" => following_obj.star.username,
+                                    "star_displayname" => following_obj.star.display_name,
+    
+                                }
+
+                                prepared_following_list.push(prepared_following_obj)
+
+                            end
+
+                            redis_obj.set("userfollowingobjectlistbyuserid#{input_user_id.to_s}", prepared_following_list.to_json)
+                            followings_list = prepared_following_list
+                        else
+
+                            cached_following_list = redis_obj.get("userfollowingobjectlistbyuserid#{input_user_id.to_s}")
+                            followings_list = JSON.parse(cached_following_list)
+                        end
+                        followings_list.to_json
+                    end
+
+                    app.get '/followersjsontest' do
+
+                        input_user_id = params[:user_id]
+
+                        redis_obj = settings.redis_instance 
+                        logger_obj = settings.logger_instance 
+
+                        if (redis_obj.get("userfollowerobjectlistbyuserid#{input_user_id.to_s}") == nil)
+
+                            follower_list_active_record = User.where(id: input_user_id)[0].star_followings
+
+                            prepared_follower_list = []
+
+                            follower_list_active_record.each do |follower_obj|
+
+                                prepared_follower_obj = {
+                                    
+                                    "fan_id" => follower_obj.fan.id,
+                                    "fan_username" => follower_obj.fan.username,
+                                    "fan_displayname" => follower_obj.fan.display_name,
+    
+                                }
+
+                                prepared_follower_list.push(prepared_follower_obj)
+
+                            end
+
+                            redis_obj.set("userfollowerobjectlistbyuserid#{input_user_id.to_s}", prepared_follower_list.to_json)
+
+                            followers_list = prepared_follower_list
+                            
+                        else
+                            cached_follower_list = redis_obj.get("userfollowerobjectlistbyuserid#{input_user_id.to_s}")
+                            followers_list = JSON.parse(cached_follower_list)
+                        end
+                        followers_list.to_json
+                    end
                 end
             end
         end
     end
 end
-
-
-
-
-#logger.info("Params to route: /updatefollowing/:fanfollowing" + params[:fanfollowing].to_s
-#+ "by user: " + session[:user_id].to_s)
-#logger.info("Looking for user in Following table @ timestamp: " + Time.now.to_i
-#+ "by user" + session[:user_id])
-# logger.error("Fan_active is true: Update failed for user: " + session[:user_id].to_s)
-# logger.error("Fan_active is false: Update failed for user: " + session[:user_id].to_s)
-# logger.info("End request to route /updatefollowing/:fanfollowing @ timestamp: " + Time.now.to_i
-#     + "by user: " + session[:user_id].to_s)
-#     logger.info("User found @ timestamp: " + Time.now.to_i)

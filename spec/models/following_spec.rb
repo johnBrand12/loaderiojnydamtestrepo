@@ -1,4 +1,3 @@
-require "spec_helper"
 require "sinatra/activerecord"
 require "active_record"
 
@@ -58,55 +57,4 @@ RSpec.describe Following, :type => :model do
 
     end
   end
-
-
-  context 'testsuite2' do
-    
-    before(:all) do
-
-      Following.delete_all()
-      User.delete_all()
-        
-      20.times do |i|
-          User.create(
-              id: i + 1,
-              username: Faker::Internet.user_name, 
-              display_name: Faker::Internet.user_name, 
-              email: Faker::Internet.email,
-              password: Faker::Internet.password,
-              active: true
-          )
-      end
-
-      (1..25).each do |id|
-          Following.create(
-              id:id,
-              star_id:rand(11..20),
-              fan_id:rand(1..10)
-          )     
-      end
-      (26..50).each do |id|
-          Following.create(
-              id:id,
-              star_id:rand(1..10),
-              fan_id:rand(11..20)
-          ) 
-      end
-    end
-
-    it "user has followers" do
-        user = User.first
-        expect(user.star_followings.length).not_to eq(0)
-
-    end
-
-    it "user follows people" do
-        user = User.first
-        expect(user.fan_followings.length).not_to eq(0)
-    end
-
-
-
-  end
-
 end

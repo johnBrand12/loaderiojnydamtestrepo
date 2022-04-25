@@ -11,16 +11,13 @@ friendSearchButton.addEventListener('click', async () => {
 
     const user = friendSearchInput.value;
 
-    let followingListCacheList = await fetch(`http://localhost:4567/following/retrievelistcache?uid=67`)
+    let followingListCacheList = await fetch(`/following/retrievelistcache?uid=67`)
 
     let followingListCacheListJson = await followingListCacheList.json();
 
-    fetch(`http://localhost:4567/search/friends/${user}`)
+    fetch(`/search/friends/${user}`)
     .then((res) => res.json())
     .then((res) => {
-
-        console.log("Successful response was returned");
-        console.log(res);
 
         let resultStringList = "";
 
@@ -28,9 +25,6 @@ friendSearchButton.addEventListener('click', async () => {
 
 
             let elem = followingListCacheListJson.filter((iterative) => {
-
-                console.log("This is the iterative object");
-                console.log(iterative);
 
                 return iterative.star_displayname === element.display_name;
 
@@ -82,8 +76,6 @@ friendSearchButton.addEventListener('click', async () => {
 
                 const localUserId = e.target.parentNode.parentNode.getAttribute('id');
 
-                const localUserDisplayName = e.target.parentNode.parentNode.querySelector('.ppl-friend-name-container').textContent.trim();
-
                 const options = {
                     method: 'POST',
                     body: JSON.stringify({
@@ -91,15 +83,9 @@ friendSearchButton.addEventListener('click', async () => {
                     })
                 };
 
-                fetch('http://localhost:4567/insertfollowingservice', options)
+                fetch('/insertfollowingservice', options)
                 .then((res) => res.json())
                 .then((res) => {
-
-                    console.log("we got to the insert following resolution");
-                    console.log(res);
-
-                    console.log("We need to perform an operation on the below button");
-                    console.dir(e.target);
 
                     e.target.className += " ppl-follow-black-white"
                     e.target.innerHTML = "Followed";

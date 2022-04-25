@@ -1,4 +1,5 @@
 ENV['APP_ENV'] = 'test'
+
 require_relative '../app.rb'
 require 'rack/test'
 require 'faker'
@@ -7,7 +8,7 @@ require 'test/spec'
 require 'rspec/core'
 
 def app
-  Sinatra::Application
+  SimpleApp
 end
 
 include Test::Unit::Assertions

@@ -29,9 +29,6 @@ group :production do
     gem 'bcrypt'
     gem 'sinatra-flash'
     gem 'thin'
-    gem 'puma'
-    gem 'redis'
-    
 end
 
 group :development do
@@ -48,9 +45,5 @@ group :development do
     gem 'bcrypt'
     gem 'sinatra-flash'
     gem 'thin'
-    gem 'puma'
-    gem 'redis'
-    gem 'ruby-debug-ide'
-    gem 'rebase'
 end
 gem "colorize", "~> 0.8.1"
