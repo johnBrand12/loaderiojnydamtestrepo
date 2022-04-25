@@ -4,19 +4,19 @@
       "names": ["login"],
       "values": [
         [
-          "user_id=1"
+          "user_id=151"
         ],
         [
-          "user_id=2"
+          "user_id=174"
         ],
         [
-          "user_id=3"
+          "user_id=192"
         ],
         [
-          "user_id=4"
+          "user_id=205"
         ],
         [
-          "user_id=5"
+          "user_id=267"
         ]
       ]
     },
@@ -29,7 +29,8 @@
         ["?x=y"],
         ["?x=y"],
         ["search?phrase=parse"],
-        ["search?phrase=override"]
+        ["search?phrase=override"],
+        ["test/tweet?count=3"]
       ]
     }
   ]
