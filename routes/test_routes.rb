@@ -21,6 +21,10 @@ module Sinatra
                         send_file 'loaderiouser.json'
                     end
 
+                    app.get '/test/rotateuserhome' do
+                        send_file 'loaderiorotateusersearchurl.json'
+                    end
+
                     app.get '/test/status' do
                         @user_count =  User.all.length 
                         @tweet_count = Tweet.all.length 
