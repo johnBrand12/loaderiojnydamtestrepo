@@ -17,6 +17,7 @@ source "https://rubygems.org"
 
 group :production do
     gem "rake"
+    gem "bunny"
     gem "sinatra"
     gem "activerecord"
     gem "sinatra-activerecord"
@@ -37,6 +38,7 @@ end
 group :development do
     gem "rake"
     gem "sinatra"
+    gem "bunny"
     gem "activerecord"
     gem "sinatra-activerecord"
     gem "pg"
