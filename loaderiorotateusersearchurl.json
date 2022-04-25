@@ -29,7 +29,7 @@
         ["?x=y"],
         ["?x=y"],
         ["search?phrase=parse"],
-        ["search?phrase=override"],
+        ["search?phrase=override"]
       ]
     }
   ]
