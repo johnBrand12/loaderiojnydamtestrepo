@@ -55,7 +55,6 @@ class SimpleApp < Sinatra::Base
     helpers TweetActions
 
     set :public_folder, 'public'
-    set :port, 4567
 
     
     configure do
