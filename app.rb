@@ -141,6 +141,10 @@ class SimpleApp < Sinatra::Base
             followings = retrieved_followings
         end
 
+        puts "These are the followings at this time"
+
+        puts followings
+
 
         @tweets = []
 
@@ -151,7 +155,23 @@ class SimpleApp < Sinatra::Base
             # an optimization could be created here to only with all the tweets of the people 
             # that they follow, not the entire database
 
-            @tweets = Tweet.all 
+            @tweets = []
+
+            followings.each do |following_num|
+
+                sub_tweet_list = Tweet.where(user_id: following_num.to_i).limit(50)
+
+                puts "This is a checkpoint to analyze the sub tweet array"
+
+                @tweets.push(*sub_tweet_list)
+
+            end
+
+            puts "This is the checkpoint to have the final active record array of tweets"
+
+            ## old code to retrieve all the tweets
+
+            # @tweets = Tweet.all 
             @tweets.each_with_index do |tweet, index|
 
                 if (followings.include? tweet.user_id) && (cached_feed_ten_pages.size < 500)
