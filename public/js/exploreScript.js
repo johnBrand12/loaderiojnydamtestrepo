@@ -5,11 +5,11 @@ const searchResultListContainer = document.querySelector('.expl-search-results-c
 
 exploreSearchButton.addEventListener('click', (e) => {
 
-    const options = {
-        method: 'POST'
-    };
+    // const options = {
+    //     method: 'POST'
+    // };
 
-    fetch(`/search?phrase=${exploreSearchInput.value}`, options)
+    fetch(`/search?phrase=${exploreSearchInput.value}`)
     .then((res) => res.json())
     .then((res) => {
 

@@ -5,7 +5,7 @@ module Sinatra
 
                 def self.registered(app)
 
-                    app.get '/search' do     #protected 
+                    app.get '/searchpage' do     #protected 
                         @logger = Logger.new($stdout)
                         start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
                         authenticate!
@@ -14,7 +14,7 @@ module Sinatra
                         erb(:explore)
                     end
                 
-                    app.post '/search' do
+                    app.get '/search' do
 
                         @logger = Logger.new($stdout)
 
