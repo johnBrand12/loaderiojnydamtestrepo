@@ -13,9 +13,12 @@ module Sinatra
                         send_file 'loaderio-89d195117aac48758a81638e7f0c784f.txt'
                     end
 
-
-                    app.get '/test/loader' do
+                    app.get '/test/loadersearchphrase' do
                         send_file 'loaderio-payload.json'
+                    end
+
+                    app.get '/test/loaderuser' do
+                        send_file 'loaderiouser.json'
                     end
 
                     app.get '/test/status' do
