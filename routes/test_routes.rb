@@ -17,6 +17,10 @@ module Sinatra
                         send_file 'loaderio-payload.json'
                     end
 
+                    app.get '/test/loadertweetcreation' do
+                        send_file 'loaderio-tweetcreation.json'
+                    end
+
                     app.get '/test/loaderuser' do
                         send_file 'loaderiouser.json'
                     end
@@ -56,7 +60,7 @@ module Sinatra
                         given_tweet_count = params[:count]
 
                         selected_user = nil
-                        
+
                         num_id = given_user_id.to_i
                         num_count = given_tweet_count.to_i
 
