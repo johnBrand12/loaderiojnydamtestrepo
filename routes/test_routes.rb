@@ -52,26 +52,53 @@ module Sinatra
 
                     app.get '/test/tweet' do
 
-                        given_user_id = params[:tweet_user]
-                        given_tweet_count = params[:tweet_count]
+                        given_user_id = params[:user_id]
+                        given_tweet_count = params[:count]
 
+                        selected_user = nil
+                        
                         num_id = given_user_id.to_i
                         num_count = given_tweet_count.to_i
+
+                        rabbit_channel_obj = settings.rabbit_channel_instance
+                        rabbit_queue_obj = settings.rabbit_queue_instance
+
+                        ## code to handle scalable writes
+
+
+                        # num_count.times do |i|
+
+                        #     puts "This is the i"
+
+                        #     # local_tweet_info = {
+                        #     #     "text" => "This is a random tweet text which works with the debugger",
+                        #     #     "user_id" => num_id,
+                        #     #     "created_at" => "Random created at for debugging purposes"
+                        #     # }
+
+                        #     local_tweet_info = {
+                        #         "text" => Faker::Lorem.paragraph_by_chars(number:rand(1..180),supplemental: false),
+                        #         "user_id" => num_id,
+                        #         "created_at" => Faker::Time.between_dates(from: Date.today - 365, to: Date.today, period: :all)
+                        #     }
+
+                        #     requested_tweet_array.push(local_tweet_info)
+                        # end
 
                         begin
                             selected_user = User.find(num_id)
                         rescue => exception
                             400
                         end
+
                         if (selected_user) 
 
-                            num_count.times do
-                                Tweet.create!(
-                                    text: Faker::Lorem.paragraph_by_chars(number:rand(1..180),supplemental: false), #generating the text for the tweet
-                                    user_id: num_id,
-                                    created_at: Faker::Time.between_dates(from: Date.today - 365, to: Date.today, period: :all) #==> when the tweet was created
-                                )
-                            end
+                            tweet_creation_request = {
+                                "num_id" => num_id,
+                                "num_count" => num_count
+                            }
+
+                            rabbit_channel_obj.default_exchange.publish(tweet_creation_request.to_json, routing_key: rabbit_queue_obj.name)
                             200
                         else
                             400    

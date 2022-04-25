@@ -8,6 +8,7 @@ require 'sinatra/flash'
 require 'faker'
 require 'redis'
 require 'json'
+require 'bunny'
 
 require_relative './lib/authentication'
 require_relative './lib/tweet_actions'
@@ -55,14 +56,22 @@ class SimpleApp < Sinatra::Base
     helpers TweetActions
 
     set :public_folder, 'public'
-
     
     configure do
         # We need to put the redis url into an environment variable later
         @redis = Redis.new(url: 'redis://redistogo:1af524c39770f9e227ef0f94a3e6ac94@sole.redistogo.com:10663/')
         @logger = Logger.new(STDOUT)
+        rabbit_conn = Bunny.new("amqps://nablsufn:ygexIYKT-cCeSkMJj_UdmU1tYGk5At_x@shark.rmq.cloudamqp.com/nablsufn")
+        rabbit_conn.start
+
+        @rabbit_channel = rabbit_conn.create_channel
+        @rabbit_queue = @rabbit_channel.queue("tweetobjectsrequest")
+
         set :redis_instance, @redis
         set :logger_instance, @logger
+        set :rabbit_channel_instance, @rabbit_channel
+        set :rabbit_queue_instance, @rabbit_queue
+
     end
 
 
