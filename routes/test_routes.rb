@@ -69,26 +69,6 @@ module Sinatra
 
                         ## code to handle scalable writes
 
-
-                        # num_count.times do |i|
-
-                        #     puts "This is the i"
-
-                        #     # local_tweet_info = {
-                        #     #     "text" => "This is a random tweet text which works with the debugger",
-                        #     #     "user_id" => num_id,
-                        #     #     "created_at" => "Random created at for debugging purposes"
-                        #     # }
-
-                        #     local_tweet_info = {
-                        #         "text" => Faker::Lorem.paragraph_by_chars(number:rand(1..180),supplemental: false),
-                        #         "user_id" => num_id,
-                        #         "created_at" => Faker::Time.between_dates(from: Date.today - 365, to: Date.today, period: :all)
-                        #     }
-
-                        #     requested_tweet_array.push(local_tweet_info)
-                        # end
-
                         begin
                             selected_user = User.find(num_id)
                         rescue => exception
@@ -103,7 +83,10 @@ module Sinatra
                             }
 
                             rabbit_channel_obj.default_exchange.publish(tweet_creation_request.to_json, routing_key: rabbit_queue_obj.name)
-                            200
+                            json_message = {
+                                "status" => "Your test tweet request was successfully sent!"
+                            }
+                            json_message.to_json
                         else
                             400    
                         end
@@ -111,109 +94,118 @@ module Sinatra
 
                     app.get '/test/reset' do
 
-                        Tweet.delete_all()
-                        Following.delete_all()
-                        User.delete_all()
+                        local_thread = Thread.new {
+                            
+                            Tweet.delete_all()
+                            Following.delete_all()
+                            User.delete_all()
 
-                        users = CSV.parse(File.read("./db/users.csv"), headers: false)
-                        tweets = CSV.parse(File.read("./db/tweets.csv"),headers: false)
-                        follows = CSV.parse(File.read("./db/follows.csv"),headers: false)
+                            users = CSV.parse(File.read("./db/users.csv"), headers: false)
+                            tweets = CSV.parse(File.read("./db/tweets.csv"),headers: false)
+                            follows = CSV.parse(File.read("./db/follows.csv"),headers: false)
 
-                        given_num_users = params[:user_count].to_i
+                            given_num_users = params[:count].to_i
 
-                        users.map! { |id, name| {"id" => id, "name" => name}}
-                        tweets.map! { |id, content, date| {"user_id" => id, "content" => content, "date" => date}}
-                        follows.map! {|fan_id, star_id| {"fan_id" => fan_id, "star_id" => star_id}}
+                            users.map! { |id, name| {"id" => id, "name" => name}}
+                            tweets.map! { |id, content, date| {"user_id" => id, "content" => content, "date" => date}}
+                            follows.map! {|fan_id, star_id| {"fan_id" => fan_id, "star_id" => star_id}}
 
-                        rand_num_array = []
+                            rand_num_array = []
 
-                        given_num_users.times do
-                            num = rand(1...1000)
-                            rand_num_array.append(num)
-                        end
+                            given_num_users.times do
+                                num = rand(1...1000)
+                                rand_num_array.append(num)
+                            end
 
-                        new_users = []
-                        new_tweets = []
-                        new_follow_relations = []
-                        new_follow_users = []
-
-
-                        # creating and keeping track of specified users
-                        rand_num_array.each_with_index do |num, index|
+                            new_users = []
+                            new_tweets = []
+                            new_follow_relations = []
+                            new_follow_users = []
 
 
-                            new_user = User.create(
-                                id: num,
-                                username:users[num - 1]["name"].downcase,
-                                display_name:users[num - 1]["name"],
-                                email:"#{users[num - 1]["name"]}@email.com",
-                                password:BCrypt::Password.create("password"),
-                                active:true
+                            # creating and keeping track of specified users
+                            rand_num_array.each_with_index do |num, index|
+
+
+                                new_user = User.create(
+                                    id: num,
+                                    username:users[num - 1]["name"].downcase,
+                                    display_name:users[num - 1]["name"],
+                                    email:"#{users[num - 1]["name"]}@email.com",
+                                    password:BCrypt::Password.create("password"),
+                                    active:true
+                                )
+
+                                new_users.append(new_user)
+
+                                tweets.each do |tweet|
+
+                                    if (tweet["user_id"] == (num).to_s) 
+                                        new_tweet = Tweet.create(
+                                            text: tweet["content"],
+                                            user_id: tweet["user_id"],
+                                            created_at: tweet["date"],
+                                            updated_at: tweet["date"]
+                                        )
+
+                                        new_tweets.append(new_tweet)
+                                    end
+                                end
+
+                                follows.each do |follow_relation|
+
+                                    if (follow_relation["fan_id"] == (num).to_s)
+
+                                        new_follow_relation = Following.create(
+                                            star_id: follow_relation["star_id"],
+                                            fan_id: follow_relation["fan_id"]
+                                        )
+
+                                        new_follow_relations.append(new_follow_relation)
+
+                                        follow_reference_num = follow_relation["star_id"].to_i
+
+                                        new_follow_user = User.create(
+                                            id: follow_reference_num,
+                                            username:users[follow_reference_num - 1]["name"].downcase,
+                                            display_name:users[follow_reference_num - 1]["name"],
+                                            email:"#{users[follow_reference_num - 1]["name"]}@email.com",
+                                            password:BCrypt::Password.create("password"),
+                                            active:true
+                                        )
+
+                                        new_follow_users.append(new_follow_user)
+
+                                    end
+
+                                end
+
+                            end
+
+                            # making sure test user is included after reset
+
+                            User.create(
+                                username: "testuser",
+                                display_name: "testuser",
+                                active: true,
+                                email: "testuser@gmail.com",
+                                password: BCrypt::Password.create("password")
                             )
-
-                            new_users.append(new_user)
-
-                            tweets.each do |tweet|
-
-                                if (tweet["user_id"] == (num).to_s) 
-                                    new_tweet = Tweet.create(
-                                        text: tweet["content"],
-                                        user_id: tweet["user_id"],
-                                        created_at: tweet["date"],
-                                        updated_at: tweet["date"]
-                                    )
-
-                                    new_tweets.append(new_tweet)
-                                end
-                            end
-
-                            follows.each do |follow_relation|
-
-                                if (follow_relation["fan_id"] == (num).to_s)
-
-                                    new_follow_relation = Following.create(
-                                        star_id: follow_relation["star_id"],
-                                        fan_id: follow_relation["fan_id"]
-                                    )
-
-                                    new_follow_relations.append(new_follow_relation)
-
-                                    follow_reference_num = follow_relation["star_id"].to_i
-
-                                    new_follow_user = User.create(
-                                        id: follow_reference_num,
-                                        username:users[follow_reference_num - 1]["name"].downcase,
-                                        display_name:users[follow_reference_num - 1]["name"],
-                                        email:"#{users[follow_reference_num - 1]["name"]}@email.com",
-                                        password:BCrypt::Password.create("password"),
-                                        active:true
-                                    )
-
-                                    new_follow_users.append(new_follow_user)
-
-                                end
-
-                            end
-
-                        end
-
-                        # making sure test user is included after reset
-
-                        User.create(
-                            username: "testuser",
-                            display_name: "testuser",
-                            active: true,
-                            email: "testuser@gmail.com",
-                            password: BCrypt::Password.create("password")
-                        )
+                        }
 
                         json_response = {
-                            users: new_users,
-                            tweets: new_tweets,
-                            relations: new_follow_relations,
-                            followed_users: new_follow_users
+                            "status" => "We received your request to reset the database"
                         }
+
                         json_response.to_json
+
+                        # json_response = {
+                        #     users: new_users,
+                        #     tweets: new_tweets,
+                        #     relations: new_follow_relations,
+                        #     followed_users: new_follow_users
+                        # }
+                        # json_response.to_json
 
                     end
 
