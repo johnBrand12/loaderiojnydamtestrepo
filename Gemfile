@@ -41,7 +41,6 @@ group :development do
     gem "rack-test"
     gem "rspec"
     gem "faker"
-    gem "redis"
     gem "sinatra-contrib"
     gem 'test_helper', '~> 0.0.1'
     gem 'bcrypt'
